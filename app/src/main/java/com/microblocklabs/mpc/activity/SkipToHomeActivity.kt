@@ -9,6 +9,8 @@ import com.microblocklabs.mpc.databinding.ActivitySkipToHomeBinding
 class SkipToHomeActivity : BaseActivity() {
     private lateinit var binding: ActivitySkipToHomeBinding
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySkipToHomeBinding.inflate(layoutInflater)
