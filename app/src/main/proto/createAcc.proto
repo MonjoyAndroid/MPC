@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package createAcc;
+
+service CreateAccService {
+    rpc CreateAcc(CreateAccRequest) returns (CreateAccResponse) {}
+}
+
+message CreateAccRequest {
+    string accountName = 1;
+}
+
+message CreateAccResponse {
+    int32 accountCount = 1;
+    string accountName = 2;
+    string ethereumAddress = 3;
+    string publicKey = 4;
+    string sharepart = 5;
+}

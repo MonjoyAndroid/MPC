@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package signup;
+
+service SignUpService {
+  rpc SignUpUser(SignUpRequest) returns (SignUpResponse);
+}
+
+message SignUpRequest {
+  string email = 1;
+  string phoneNumber = 2;
+  string uniqueId = 3;
+  string password = 4;
+}
+
+message SignUpResponse {
+  string email = 1;
+  bool emailVerified = 2;
+  string phoneNumber = 3;
+  bool phoneNumberVerified = 4;
+  repeated Wallet wallet = 5;
+  string mnemonic = 6;
+}
+
+message Wallet {
+  int32 accountCount = 1;
+  string accountName = 2;
+  string ethereumAddress = 3;
+  string publickey = 4;
+  Share sharepart = 5;
+  double TwoPercent = 6;
+  double RestValue = 7;
+  double PerMonth = 8;
+  double Cifd = 9;
+  string uniqueId = 10;
+  bool ifUniqueId = 11;
+}
+
+message Share {
+  string x = 1;
+  string y = 2;
+}

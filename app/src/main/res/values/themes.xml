@@ -1,0 +1,48 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.MPC" parent="Theme.Material3.DayNight.NoActionBar">
+        <!--   your app branding color for the app bar -->
+        <item name="colorPrimary">#3cd997</item>
+        <!--   darker variant for the status bar and contextual app bars -->
+        <item name="colorPrimaryDark">#1B1C1C</item>
+        <!--   theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">#FAFAFA</item>
+    </style>
+
+    <style name="Theme.MPC" parent="Base.Theme.MPC" />
+
+    <style name="LoadingDialog" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="DialogTitleAppearance">@android:style/TextAppearance.Medium</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="DialogTitleText">@string/loading</item>
+        <item name="DialogSpotColor">@android:color/holo_orange_dark</item>
+        <item name="DialogSpotCount">5</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay"
+        parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay"
+        parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="FullScreenDialog" parent="Base.Theme.MPC">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:navigationBarColor">@color/black</item>
+    </style>
+
+    <style name="ThemeOverlay.MPC.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+    </style>
+
+    <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/AppModalStyle</item>
+    </style>
+
+    <style name="AppModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_corner_bottomsheet</item>
+    </style>
+
+</resources>

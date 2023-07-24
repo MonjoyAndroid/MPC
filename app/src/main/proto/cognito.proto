@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package cognito;
+
+service CognitoService {
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
+  rpc ConfirmForgotPassword(ConfirmForgotPasswordRequest) returns (ConfirmForgotPasswordResponse);
+  rpc FindUserByMnemonicPhrase(stream FindUserByMnemonicPhraseRequest) returns (stream FindUserByMnemonicPhraseResponse) {};
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  string message = 1;
+}
+
+message ConfirmForgotPasswordRequest {
+  string email = 1;
+  string verification_code = 2;
+  string new_password = 3;
+}
+
+message ConfirmForgotPasswordResponse {
+  string message = 1;
+}
+
+message FindUserByMnemonicPhraseRequest {
+  string mnemonic_phrase = 1;
+  string email = 2;
+  string verification_code = 3;
+  string new_password = 4;
+}
+
+message FindUserByMnemonicPhraseResponse {
+  string user_id = 1;
+  string email = 2;
+  repeated WalletAccount wallet = 3;
+  string mnemonic = 4;
+  string message = 5;
+}
+
+message WalletAccount {
+  int32 account_count = 1;
+  string account_name = 2;
+  string ethereum_address = 3;
+  string public_key = 4;
+  string share_part = 5;
+}

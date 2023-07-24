@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package confirmUser;
+
+message ConfirmUserRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message ConfirmUserResponse {
+  string message = 1;
+}
+
+service ConfirmUserService {
+  rpc ConfirmUser(ConfirmUserRequest) returns (ConfirmUserResponse) {}
+}

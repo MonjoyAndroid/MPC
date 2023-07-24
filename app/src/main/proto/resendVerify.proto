@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package resendVerify;
+
+service ResendVerifyService {
+  rpc ResendVerify (VerificationRequest) returns (VerificationResponse);
+}
+
+message VerificationRequest {
+  string email = 1;
+}
+
+message VerificationResponse {
+  string message = 1;
+}

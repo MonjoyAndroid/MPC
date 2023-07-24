@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package cifd;
+
+service BalanceService {
+  rpc GetBalance(BalanceRequest) returns (BalanceResponse);
+}
+
+message BalanceRequest {
+  string address = 1;
+}
+
+message BalanceResponse {
+  string address = 1;
+  string balance = 2;
+}

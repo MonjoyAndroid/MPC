@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package loginVerify;
+
+message VerifyMfaCodeRequest {
+  string email = 1;
+  string mfa_code = 2;
+  string session = 3;
+}
+
+message VerifyMfaCodeResponse {
+  bool success = 1;
+}
+
+service LoginVerifyService {
+  rpc VerifyMfaCode(VerifyMfaCodeRequest) returns (VerifyMfaCodeResponse);
+}
