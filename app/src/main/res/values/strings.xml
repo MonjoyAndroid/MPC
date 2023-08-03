@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">MPC</string>
+    <string name="app_name">CIFDAQ Wallet</string>
     <string name="welcome">Welcome</string>
     <string name="sign_up">Sign Up</string>
     <string name="loading">Loading</string>
@@ -8,32 +8,34 @@
     <string name="login">Login</string>
     <string name="import_wallet">Import your wallet from secret phrase</string>
     <string name="create_wallet">Create a new wallet</string>
-    <string name="first_slide_desc">Get ready to unlock the potential of your cryptocurrencies with CIFDAQ wallet. Lets make managing cryptocurrencies simple and convenient.</string>
+    <string name="first_slide_desc">Get ready to unlock the potential of your digital assets with CIFDAQ wallet. Lets make managing digital assets simple and convenient.</string>
     <string name="first_slide_heading">Future Proof Crypto Wallet</string>
     <string name="second_slide_heading">SECURE &amp; SAFE WALLET</string>
-    <string name="second_slide_desc">Welcome to CIFDAQ wallet. Trust, security, and innovation - all at your fingertips as you embark on this thrilling crypto adventure.</string>
+    <string name="second_slide_desc">Welcome to CIFDAQ wallet. Trust, security and innovation - all at your fingertips as you embark on this thrilling crypto adventure.</string>
 
     <string name="next">NEXT</string>
     <string name="done">DONE</string>
     <string name="unlock">UNLOCK</string>
     <string name="skip">Skip</string>
     <string name="wallet_setup">WALLET SETUP</string>
-    <string name="wallet_setup_desc">Create a new account or recover your existing one to start managing your cryptocurrencies effortlessly. Your financial future awaits!</string>
+    <string name="wallet_setup_desc">Create a new account or recover your existing one to start managing your digital assets effortlessly. Your financial future awaits!</string>
     <string name="verify">Verify</string>
     <string name="create_your_wallet">SIGN UP</string>
     <string name="protect_wallet_message">Do not risk losing your funds. Protect your wallet by saving</string>
-    <string name="enter_email">Enter your email</string>
-    <string name="enter_mobile">Enter your mobile number</string>
-    <string name="enter_password">Enter your password</string>
+    <string name="enter_email">Enter email</string>
+    <string name="enter_mobile">Enter mobile no</string>
+    <string name="enter_password">Enter password</string>
     <string name="enter_pass">Enter Password</string>
-    <string name="enter_confirm_password">Confirm your password</string>
+    <string name="new_password">New password <font color='#FF0000'>*</font></string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="enter_confirm_password">Confirm password</string>
     <string name="pass_suggestion_msg">Password must be atleast  8 characters, 1 upper, 1 lower, 1 special and 1 numeric characters </string>
     <string name="unique_id_suggestion_msg">if you are already a part of CIFDAQ family then you would have received a Unique ID in the email</string>
     <string name="otp_timer">OTP expires in: </string>
-    <string name="email">Email <font color='#FF0000'>*</font></string>
+    <string name="email">Email Address <font color='#FF0000'>*</font></string>
     <string name="email_without_asteric">Email</string>
     <string name="show">Show</string>
-    <string name="otp">OTP</string>
+    <string name="otp">OTP <font color='#FF0000'>*</font></string>
     <string name="mobile">Mobile</string>
     <string name="mob_number">Mobile number (optional)</string>
     <string name="unique_id">Unique ID (optional)</string>
@@ -44,8 +46,11 @@
     <string name="otp_verification">Verify Your Identification</string>
     <string name="enter_otp">Enter your OTP</string>
     <string name="please_enter_otp">Please enter your OTP</string>
+    <string name="otp_expired_msg">OTP has been expired. Click on resend button to get new otp</string>
     <string name="secret_recovery">Secret recovery phrase</string>
     <string name="enter_phrase_title">Enter your 12 words recovery phrase</string>
+    <string name="please_enter_phrase">Please enter your 12 words recovery phrase</string>
+    <string name="user_not_found_by_phrase_msg">Please enter the correct seed phrase or user not yet registered</string>
     <string name="secret_recovery_msg">Please copy the secret recovery phrase in a safe place.This will be required for account recovery.</string>
     <string name="copy_to_clipboard">Copy To Clipboard</string>
     <string name="congratulation_title">Congratulations ! Your Crypto Wallet is Ready !</string>
@@ -57,7 +62,7 @@
     <string name="send">Send</string>
     <string name="send_desc">To send crypto to other persons</string>
     <string name="recieve">Receive</string>
-    <string name="recieve_desc">To send crypto to other persons</string>
+    <string name="recieve_desc">To receive crypto from other persons</string>
     <string name="skip_to_login_message">Want to use any feature in the application please follow the action below</string>
     <string name="receive_transaction">Receive Transaction</string>
     <string name="show_qr_desc">Give your QR code or Wallet address to receive transaction</string>
@@ -65,9 +70,9 @@
     <string name="send_transaction">Send Transaction</string>
     <string name="send_transaction_desc">Enter recipient account address and transaction amount to send transaction</string>
     <string name="sender_address">Sender Address</string>
-    <string name="receiver_address">Receiver Address</string>
+    <string name="receiver_address">Receiver Address <font color='#FF0000'>*</font></string>
     <string name="enter_recipient_address_hint">Enter recipient account address</string>
-    <string name="amount">Amount</string>
+    <string name="amount">Amount <font color='#FF0000'>*</font></string>
     <string name="sent_amount_hint">Enter amount here</string>
     <string name="gas">Gas</string>
     <string name="gas_limit">Gas Limit</string>

@@ -29,8 +29,8 @@ class ReleaseDetailsAdapter(private val mList: List<ReleaseItem>, private val co
 
             if (holder.itemViewType == TYPE_HEADER){
                 val headerHolder = holder as ViewHolderHeader
-                headerHolder.tvDate.text = "Next Release Date"
-                headerHolder.tvToken.text = "Tokens"
+                headerHolder.tvDate.text = "Release Date"
+                headerHolder.tvToken.text = "Tokens (CIFD)"
                 headerHolder.tvStatus.text = "Status"
                 headerHolder.tvDate.setTextColor(context.resources.getColor(R.color.white))
                 headerHolder.tvToken.setTextColor(context.resources.getColor(R.color.white))

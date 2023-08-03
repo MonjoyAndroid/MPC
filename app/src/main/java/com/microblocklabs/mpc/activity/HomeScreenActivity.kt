@@ -2,14 +2,24 @@ package com.microblocklabs.mpc.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.PopupWindow
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.Nullable
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.GravityCompat
+import androidx.core.view.MenuCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayout
 import com.google.zxing.integration.android.IntentIntegrator
+import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.adapter.CategoryDropdownAdapter.CategorySelectedListener
 import com.microblocklabs.mpc.adapter.ReleaseDetailsAdapter
 import com.microblocklabs.mpc.adapter.TokenViewPagerAdapter
@@ -23,10 +33,20 @@ import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.room.entity.WalletDetails
 import com.microblocklabs.mpc.utility.CategoryDropdownMenu
 import com.microblocklabs.mpc.utility.CommonUtils
+import dmax.dialog.BuildConfig
 
 
 @Suppress("DEPRECATED_IDENTITY_EQUALS")
-class HomeScreenActivity : BaseActivity() {
+class HomeScreenActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private lateinit var imgAccount: ImageView
+    private lateinit var imgNavClose: ImageView
+    private lateinit var linearNavWalletName: LinearLayout
+    private lateinit var txtNavWalletName: TextView
+    private lateinit var txtNavWalletAmount: TextView
+    private lateinit var txtNavWalletAddress: TextView
+    private lateinit var footerNavAppName: TextView
+    private lateinit var footerNavAppVersion: TextView
+
     private lateinit var binding: ActivityHomeScreenBinding
     private lateinit var bottomSheetFragment: WalletBottomSheetFragment
     private var userProfile: List<UserProfile>? = null
@@ -45,7 +65,12 @@ class HomeScreenActivity : BaseActivity() {
         populateReleaseData()
         setupTabLayout()
         setupViewPager()
-
+        setupDrawerLayout()
+        if(walletList!![0].ifUniqueId){
+            showVestingSchedule()
+        }else{
+            hideVestingSchedule()
+        }
 
         binding.tvNetworkName.setOnClickListener{
             showCategoryMenu()
@@ -71,17 +96,59 @@ class HomeScreenActivity : BaseActivity() {
         }
 
         binding.imgHamburger.setOnClickListener{
-            showMessage("Navigation drawer work is under process")
+            if (!binding.drawerLayout.isDrawerOpen(GravityCompat.END)) binding.drawerLayout.openDrawer(GravityCompat.END) else binding.drawerLayout.closeDrawer(
+                GravityCompat.END
+            )
+        }
+
+        imgNavClose.setOnClickListener {
+            binding.drawerLayout.closeDrawer(GravityCompat.END)
         }
 
         binding.imgScanner.setOnClickListener{
             openQRScanner()
-//            showMessage("QR code scanner work is under process")
         }
 
         binding.layoutVestingHeader.setOnClickListener{
             showHideVestingContainer()
         }
+    }
+
+    private fun setupDrawerLayout(){
+        imgAccount = binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.img_account)
+        imgNavClose = binding.navView.getHeaderView(0).findViewById<ImageView>(R.id.img_nav_close)
+        linearNavWalletName = binding.navView.getHeaderView(0).findViewById<LinearLayout>(R.id.nav_layout_wallet_name)
+        txtNavWalletName = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.nav_wallet_name)
+        txtNavWalletAmount = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.nav_wallet_amount)
+        txtNavWalletAddress = binding.navView.getHeaderView(0).findViewById<TextView>(R.id.nav_wallet_address)
+        footerNavAppName = binding.navView.findViewById<TextView>(R.id.footer_nav_app_name)
+        footerNavAppVersion = binding.navView.findViewById<TextView>(R.id.footer_nav_app_version)
+
+        txtNavWalletName.text = walletList!![0].accountName
+//        txtNavWalletAmount.text = walletList!![0].a
+        txtNavWalletAddress.text = walletList!![0].ethereumAddress
+        footerNavAppName.text = CommonUtils.getAppName(this)
+        footerNavAppVersion.text = CommonUtils.getAppVersionName()
+
+        val toggle = ActionBarDrawerToggle(
+            this, binding.drawerLayout, 0, 0)
+        binding.drawerLayout.addDrawerListener(toggle)
+        toggle.syncState()
+        binding.navView.setNavigationItemSelectedListener(this)
+
+        linearNavWalletName.setOnClickListener{
+
+        }
+    }
+
+    private fun showVestingSchedule(){
+        binding.titleVestingCifd.visibility = View.VISIBLE
+        binding.vestingView.visibility = View.VISIBLE
+    }
+
+    private fun hideVestingSchedule(){
+        binding.titleVestingCifd.visibility = View.GONE
+        binding.vestingView.visibility = View.GONE
     }
 
     private fun showHideVestingContainer() {
@@ -156,20 +223,20 @@ class HomeScreenActivity : BaseActivity() {
 
     private fun populateReleaseData(){
         releaseDetailsList = ArrayList()
-        releaseDetailsList!!.add(ReleaseItem("15 July", "4898 CIFD", "Released"))
-        releaseDetailsList!!.add(ReleaseItem("25 July", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("30 July", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("02 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("10 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("20 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("25 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("28 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("30 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("10 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("20 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("25 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("28 AUG", "4898 CIFD", "Yet to release"))
-        releaseDetailsList!!.add(ReleaseItem("30 AUG", "4898 CIFD", "Yet to release"))
+        releaseDetailsList!!.add(ReleaseItem("16 Nov 2023", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Dec 2023", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Jan 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Feb 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Mar 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Apr 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 May 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Jun 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Jul 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Aug 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Sep 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Oct 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Nov 2024", "0.14", "Vested"))
+        releaseDetailsList!!.add(ReleaseItem("16 Dec 2024", "0.14", "Vested"))
 
         setupReleaseRecyclerView()
     }
@@ -216,7 +283,6 @@ class HomeScreenActivity : BaseActivity() {
             })
         }
 
-
     }
 
 
@@ -249,6 +315,33 @@ class HomeScreenActivity : BaseActivity() {
         }
     }
 
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_activity -> {
+                Toast.makeText(this, "Activity clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_share -> {
+                Toast.makeText(this, "Share clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_view -> {
+                Toast.makeText(this, "View clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_settings -> {
+                Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_support -> {
+                Toast.makeText(this, "Support clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_request -> {
+                Toast.makeText(this, "Request clicked", Toast.LENGTH_SHORT).show()
+            }
+            R.id.nav_logout -> {
+                Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show()
+            }
+        }
+        binding.drawerLayout.closeDrawer(GravityCompat.END)
+        return true
+    }
 
 
 }

@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.EditText
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import cognito.Cognito
+import cognito.CognitoServiceGrpc
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.adapter.PhraseRecyclerViewAdapter
 import com.microblocklabs.mpc.databinding.ActivityPhaseRecoveryBinding
@@ -24,6 +26,8 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import resendVerify.ResendVerify
+import resendVerify.ResendVerifyServiceGrpc
 import signup.SignUpServiceGrpc
 import signup.Signup
 import java.util.Random
@@ -63,6 +67,7 @@ class PhraseRecoveryActivity : BaseActivity() {
 
         binding.buttonNext.setOnClickListener{
 
+//            showChangePasswordScreen()
             when(openPurposeVal) {
                 0 -> showCongratulationScreen()
                 2 -> verifyPhrase()
@@ -77,7 +82,7 @@ class PhraseRecoveryActivity : BaseActivity() {
         for (i in 0 until recyclerDataArrayList.size ) {
             val view = binding.recyclerPhrase.getChildAt(i)
             val phraseEditText = view!!.findViewById(R.id.et_phrase) as EditText
-            val phrase = phraseEditText.text.toString()
+            val phrase = phraseEditText.text.toString().trim()
             enteredPhraseList.add(phrase)
         }
 
@@ -116,7 +121,40 @@ class PhraseRecoveryActivity : BaseActivity() {
 
     private fun showChangePasswordScreen() {
         startActivity(Intent(this, ChangePasswordActivity::class.java))
-//        finish()
+        finish()
+    }
+
+    private fun requestForSendOTP(email: String) {
+        val cognitoService = CognitoServiceGrpc.newBlockingStub(connectionChannel)
+        val requestMessage = Cognito.ForgotPasswordRequest.newBuilder()
+            .setEmail(email)
+            .build()
+
+        showLoadingDialog()
+
+        Single.fromCallable { cognitoService.forgotPassword(requestMessage) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<Cognito.ForgotPasswordResponse> {
+                override fun onSuccess(response: Cognito.ForgotPasswordResponse) {
+                    dismissLoadingDialog()
+//                    Log.d("MyResponse", response.toString())
+                    showMessage(response.message)
+                    showChangePasswordScreen()
+                }
+
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
+                    dismissLoadingDialog()
+                    showErrorMessage(displayMsg)
+                }
+            })
     }
 
     private fun showLoginScreen() {
@@ -260,41 +298,60 @@ class PhraseRecoveryActivity : BaseActivity() {
 
 
     private fun getUserDetailsByMnemonicPhrase(mnemonicPhrase: String) {
+        if (mnemonicPhrase.trim().isEmpty()) {
+            showWarningMessage(resources.getString(com.microblocklabs.mpc.R.string.please_enter_phrase))
+            return
+        }
 
-//        val signUpService = SignUpServiceGrpc.newBlockingStub(connectionChannel)
-//
-//        val requestMessage = Signup.SignUpRequest.newBuilder()
-//            .setEmail(email)
-//            .setPhoneNumber(phone)
-//            .setPassword(password)
-//            .setUniqueId(uniqueID)
-//            .build()
-//
-//        showLoadingDialog()
-//
-//        Single.fromCallable { signUpService.signUpUser(requestMessage) }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe(object : SingleObserver<Signup.SignUpResponse> {
-//                override fun onSuccess(response: Signup.SignUpResponse) {
-//                    dismissLoadingDialog()
-//
-//                    Log.d("MyResponse", response.toString())
-//
-//                    saveUserData(response)
-//                }
-//
-//                override fun onSubscribe(d: Disposable) {}
-//
-//                override fun onError(e: Throwable) {
-//                    dismissLoadingDialog()
-//                    showErrorMessage("Error:  ${e.message}")
-//                }
-//            })
+        val cognitoService = CognitoServiceGrpc.newBlockingStub(connectionChannel)
+        val requestMessage = Cognito.FindUserByMnemonicPhraseRequest.newBuilder()
+            .setMnemonicPhrase(mnemonicPhrase)
+            .build()
+
+        showLoadingDialog()
+
+        Single.fromCallable { cognitoService.findUserByMnemonicPhrase(requestMessage) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<Cognito.FindUserByMnemonicPhraseResponse> {
+                override fun onSuccess(response: Cognito.FindUserByMnemonicPhraseResponse) {
+                    dismissLoadingDialog()
+                    Log.d("MyResponse", response.toString())
+                    when(openPurposeVal) {
+                        2 -> checkEmailValidityByPhrase(response)
+                        3 -> saveUserData(response)
+                    }
+
+
+                }
+
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
+                    dismissLoadingDialog()
+                    showErrorMessage(displayMsg)
+                }
+            })
     }
 
-    private fun saveUserData(response : Signup.SignUpResponse) {
-        val userProfile = UserProfile(response.email, response.emailVerified, response.phoneNumber, response.phoneNumberVerified, response.mnemonic)
+    private fun checkEmailValidityByPhrase(response : Cognito.FindUserByMnemonicPhraseResponse){
+        userProfile = db.mUserProfileDao()!!.getUserProfile()
+        if(response.email == userProfile[0].email){
+            requestForSendOTP(userProfile[0].email)
+        }else{
+           showMessage("Please enter key phrases for your account")
+        }
+
+    }
+
+
+    private fun saveUserData(response : Cognito.FindUserByMnemonicPhraseResponse) {
+        val userProfile = UserProfile(response.email, response.emailVerified, response.phoneNumber, response.phoneVerified, response.mnemonic)
         userProfileViewModel.insertUserProfile(userProfile)
 
         val walletList = response.walletList
@@ -305,10 +362,10 @@ class PhraseRecoveryActivity : BaseActivity() {
                 walletList[i].accountCount,
                 walletList[i].accountName,
                 walletList[i].publickey,
-                walletList[i].twoPercent,
-                walletList[i].restValue,
-                walletList[i].perMonth,
-                walletList[i].cifd,
+                walletList[i].twoPercent.toDouble(),
+                walletList[i].restValue.toDouble(),
+                walletList[i].perMonth.toDouble(),
+                walletList[i].cifd.toDouble(),
                 walletList[i].uniqueId,
                 walletList[i].ifUniqueId
             )
@@ -319,10 +376,7 @@ class PhraseRecoveryActivity : BaseActivity() {
             sharePartViewModel.insertSharedPart(sharePartDetails)
         }
 
-        when(openPurposeVal) {
-            2 -> showChangePasswordScreen()
-            3 -> showLoginScreen()
-        }
+        showLoginScreen()
     }
 
 }

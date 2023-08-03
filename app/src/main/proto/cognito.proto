@@ -5,7 +5,7 @@ package cognito;
 service CognitoService {
   rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse);
   rpc ConfirmForgotPassword(ConfirmForgotPasswordRequest) returns (ConfirmForgotPasswordResponse);
-  rpc FindUserByMnemonicPhrase(stream FindUserByMnemonicPhraseRequest) returns (stream FindUserByMnemonicPhraseResponse) {};
+  rpc FindUserByMnemonicPhrase(FindUserByMnemonicPhraseRequest) returns (FindUserByMnemonicPhraseResponse) {};
 }
 
 message ForgotPasswordRequest {
@@ -28,23 +28,35 @@ message ConfirmForgotPasswordResponse {
 
 message FindUserByMnemonicPhraseRequest {
   string mnemonic_phrase = 1;
-  string email = 2;
-  string verification_code = 3;
-  string new_password = 4;
 }
 
 message FindUserByMnemonicPhraseResponse {
   string user_id = 1;
   string email = 2;
-  repeated WalletAccount wallet = 3;
-  string mnemonic = 4;
-  string message = 5;
+  bool emailVerified = 4;
+  string phoneNumber = 5;
+  bool phoneVerified = 6;
+  repeated WalletEntry wallet = 7;
+  bool newUser = 8;
+  string mnemonic = 9;
+  string message = 10;
 }
 
-message WalletAccount {
-  int32 account_count = 1;
-  string account_name = 2;
-  string ethereum_address = 3;
-  string public_key = 4;
-  string share_part = 5;
+message WalletSharePart {
+  string x = 1;
+  string y = 2;
+}
+
+message WalletEntry {
+  int32 accountCount = 1;
+  string accountName = 2;
+  string ethereumAddress = 3;
+  string publickey = 4;
+  WalletSharePart sharepart = 5;
+  int32 TwoPercent = 6;
+  int32 RestValue = 7;
+  int32 PerMonth = 8;
+  int32 Cifd = 9;
+  string uniqueId = 10;
+  bool ifUniqueId = 11;
 }

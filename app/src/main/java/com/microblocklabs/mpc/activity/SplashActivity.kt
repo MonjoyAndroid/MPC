@@ -93,8 +93,13 @@ class SplashActivity : BaseActivity() {
                 override fun onSubscribe(d: Disposable) {}
 
                 override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
                     dismissLoadingDialog()
-                    showErrorMessage("Error:  ${e.message}")
+                    showErrorMessage(displayMsg)
                 }
             })
     }

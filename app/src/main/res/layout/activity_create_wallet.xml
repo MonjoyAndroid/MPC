@@ -162,26 +162,25 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_pass"
         tools:ignore="MissingConstraints">
 
-        <TextView
-            android:id="@+id/tv_show_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/show"
-            android:textSize="15sp"
+        <ImageView
+            android:id="@+id/img_show_hide_pass"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:textColor="@color/grey"
+            android:background="@drawable/icon_show"
+            android:contentDescription="@string/show"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="UseAppTint" />
 
         <EditText
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@null"
-            android:layout_toStartOf="@+id/tv_show_pass"
+            android:layout_toStartOf="@+id/img_show_hide_pass"
             android:hint="@string/enter_password"
             android:inputType="textPassword"
             android:padding="15dp"
@@ -220,26 +219,25 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_confirm_pass"
         tools:ignore="MissingConstraints">
 
-        <TextView
-            android:id="@+id/tv_show_confirm_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/show"
-            android:textSize="15sp"
+        <ImageView
+            android:id="@+id/img_show_hide_confirm_pass"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:textColor="@color/grey"
+            android:background="@drawable/icon_show"
+            android:contentDescription="@string/show"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="UseAppTint" />
 
         <EditText
             android:id="@+id/et_confirm_password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@null"
-            android:layout_toStartOf="@+id/tv_show_confirm_pass"
+            android:layout_toStartOf="@+id/img_show_hide_confirm_pass"
             android:hint="@string/enter_confirm_password"
             android:inputType="textPassword"
             android:padding="15dp"
@@ -299,8 +297,9 @@
                 android:layout_height="wrap_content"
                 app:ccp_defaultNameCode="IND"
                 app:ccp_arrowColor="@color/grey"
-                app:ccpDialog_backgroundColor="@color/base_primary"
-                app:ccp_contentColor="@color/white"
+                app:ccpDialog_backgroundColor="@color/white"
+                app:ccp_contentColor="@color/grey"
+                app:ccpDialog_textColor="@color/black"
                 app:ccp_autoDetectCountry="true"
                 app:ccp_showFlag="true"
                 app:ccp_showNameCode="false"

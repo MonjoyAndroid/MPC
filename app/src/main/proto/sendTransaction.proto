@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package sendTransaction;
+
+message TransactionRequest {
+  string email = 1;
+  string senderAddress = 2;
+  string receiverAddress = 3;
+  string token = 4;
+  string userid = 5;
+  Share sharepart = 6;
+}
+message Share {
+  string x = 1;
+  string y = 2;
+}
+
+message TransactionResponse {
+  string transactionHash = 1;
+  string status = 2;
+  optional string error = 3;
+}
+
+service SendTransactionService {
+  rpc SendTransaction(TransactionRequest) returns (TransactionResponse) {}
+}

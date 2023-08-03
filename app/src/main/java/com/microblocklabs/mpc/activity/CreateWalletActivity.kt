@@ -76,13 +76,13 @@ class CreateWalletActivity : BaseActivity() {
             }
         }
 
-        binding.tvShowPass.setOnClickListener {
+        binding.imgShowHidePass.setOnClickListener {
             if (binding.etPassword.length() > 0)
                 showHidePass("ShowPass")
         }
 
-        binding.tvShowConfirmPass.setOnClickListener {
-            if (binding.etPassword.length() > 0)
+        binding.imgShowHideConfirmPass.setOnClickListener {
+            if (binding.etConfirmPassword.length() > 0)
                 showHidePass("ShowConfirmPass")
         }
 
@@ -116,25 +116,27 @@ class CreateWalletActivity : BaseActivity() {
     private fun showHidePass(showHideFor: String) {
         when(showHideFor) {
             "ShowPass" -> {
-                if (binding.tvShowPass.text == "Show") {
-                    binding.tvShowPass.text = "Hide"
+                if(binding.imgShowHidePass.contentDescription == "Show"){
                     //Show Password
+                    binding.imgShowHidePass.contentDescription = "Hide"
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-                } else {
-                    binding.tvShowPass.text = "Show"
+                }else{
                     //Hide Password
+                    binding.imgShowHidePass.contentDescription = "Show"
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
                     binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etPassword.setSelection(binding.etPassword.length())
             }
             "ShowConfirmPass" -> {
-                if (binding.tvShowConfirmPass.text == "Show") {
-                    binding.tvShowConfirmPass.text = "Hide"
-                    //Show Password
+                if (binding.imgShowHideConfirmPass.contentDescription == "Show") {
+                    binding.imgShowHideConfirmPass.contentDescription = "Hide"
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 } else {
-                    binding.tvShowConfirmPass.text = "Show"
-                    //Hide Password
+                    binding.imgShowHideConfirmPass.contentDescription = "Show"
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_show)
                     binding.etConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etConfirmPassword.setSelection(binding.etConfirmPassword.length())
@@ -299,8 +301,13 @@ class CreateWalletActivity : BaseActivity() {
                 override fun onSubscribe(d: Disposable) {}
 
                 override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
                     dismissLoadingDialog()
-                    showErrorMessage("Error:  ${e.message}")
+                    showErrorMessage(displayMsg)
                 }
             })
     }

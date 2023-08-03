@@ -83,26 +83,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="MissingConstraints">
 
-        <TextView
-            android:id="@+id/tv_show_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/show"
-            android:textSize="15sp"
+        <ImageView
+            android:id="@+id/img_show_hide_pass"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
-            android:textColor="@color/grey"
+            android:background="@drawable/icon_show"
+            android:contentDescription="@string/show"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="10dp"
-            tools:ignore="MissingConstraints" />
+            tools:ignore="UseAppTint" />
 
         <EditText
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@null"
-            android:layout_toStartOf="@+id/tv_show_pass"
+            android:layout_toStartOf="@+id/img_show_hide_pass"
             android:hint="@string/enter_password"
             android:inputType="textPassword"
             android:padding="15dp"

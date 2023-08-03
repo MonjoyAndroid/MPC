@@ -1,6 +1,5 @@
 package com.microblocklabs.mpc.activity
 
-import android.R
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +7,7 @@ import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
+import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityLoginBinding
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
@@ -35,13 +35,13 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
         fetchDataFromDatabase()
-        binding.tvShowPass.setOnClickListener {
+        binding.imgShowHidePass.setOnClickListener {
             if (binding.etPassword.length() > 0)
                 showHidePass()
         }
 
         binding.tvForgotPass.setOnClickListener{
-            showMessage("Work is under process")
+            navigateToPhraseScreen()
         }
 
         binding.buttonUnlock.setOnClickListener{
@@ -57,13 +57,15 @@ class LoginActivity : BaseActivity() {
 
     @SuppressLint("SetTextI18n")
     fun showHidePass() {
-        if (binding.tvShowPass.text == "Show") {
-            binding.tvShowPass.text = "Hide"
+        if(binding.imgShowHidePass.contentDescription == "Show"){
             //Show Password
+            binding.imgShowHidePass.contentDescription = "Hide"
+            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
             binding.etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
-        } else {
-            binding.tvShowPass.text = "Show"
+        }else{
             //Hide Password
+            binding.imgShowHidePass.contentDescription = "Show"
+            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
             binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
         }
         binding.etPassword.setSelection(binding.etPassword.length())
@@ -101,8 +103,13 @@ class LoginActivity : BaseActivity() {
                 override fun onSubscribe(d: Disposable) {}
 
                 override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
                     dismissLoadingDialog()
-                    showErrorMessage("Error:  ${e.message}")
+                    showErrorMessage(displayMsg)
                 }
             })
     }
@@ -115,6 +122,13 @@ class LoginActivity : BaseActivity() {
     private fun startHomeActivity() {
         startActivity(Intent(this, HomeScreenActivity::class.java))
         finishAffinity()
+    }
+
+    private fun navigateToPhraseScreen(){
+        startActivity(Intent(applicationContext, PhraseRecoveryActivity::class.java).apply {
+            putExtra("openPhraseFor", 2)
+        })
+//        finish()
     }
 //
 //    private fun startSignUpActivity() {

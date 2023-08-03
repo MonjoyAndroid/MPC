@@ -30,7 +30,7 @@ class OTPVerificationActivity : BaseActivity() {
     private var userProfile: List<UserProfile>? = null
     var openPurposeVal = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3
 
-    var startMiliSeconds = 60000L * 10
+    var startMiliSeconds = 60000L * 3
     lateinit var countdownTimer: CountDownTimer
     var isRunning: Boolean = false;
     var timeInMiliSeconds = 0L
@@ -62,6 +62,7 @@ class OTPVerificationActivity : BaseActivity() {
             }
             requestForSendOTP(binding.etEmail.text.toString())
         }
+
         binding.buttonVerify.setOnClickListener{
             requestForVerifyOTP(binding.etEmail.text.toString(), binding.etEmailOtp.text.toString()) //For Email otp
 //            requestForVerifyOTP(binding.etMobile.text.toString(), binding.etMobOtp.text.toString()) //For mobile otp
@@ -95,6 +96,7 @@ class OTPVerificationActivity : BaseActivity() {
             override fun onFinish() {
                 countdownTimer.cancel()
                 isRunning = false
+                showMessage(resources.getString(R.string.otp_expired_msg))
             }
         }
         countdownTimer.start()
@@ -113,6 +115,13 @@ class OTPVerificationActivity : BaseActivity() {
         val minute = (timeInMiliSeconds / 1000) / 60
         val seconds = (timeInMiliSeconds / 1000) % 60
         binding.tvOtpTimer.text = "${resources.getString(R.string.otp_timer)} $minute:$seconds"
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        countdownTimer.cancel()
+        isRunning = false
     }
 
     private fun requestForSendOTP(email: String) {
@@ -136,8 +145,13 @@ class OTPVerificationActivity : BaseActivity() {
                 override fun onSubscribe(d: Disposable) {}
 
                 override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
                     dismissLoadingDialog()
-                    showErrorMessage("Error:  ${e.message}")
+                    showErrorMessage(displayMsg)
                 }
             })
     }
@@ -146,6 +160,11 @@ class OTPVerificationActivity : BaseActivity() {
         if (email.isEmpty() or otp.isEmpty()) {
             binding.etEmailOtp.background = ContextCompat.getDrawable(applicationContext, R.drawable.bg_border_red)
             showWarningMessage(resources.getString(R.string.please_enter_otp))
+            return
+        }
+
+        if(!isRunning){
+            showWarningMessage(resources.getString(R.string.otp_expired_msg))
             return
         }
 
@@ -176,10 +195,14 @@ class OTPVerificationActivity : BaseActivity() {
                 override fun onSubscribe(d: Disposable) {}
 
                 override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
                     dismissLoadingDialog()
+                    showErrorMessage(displayMsg)
                     setNavigationValueForNextScreen(false)
-                    showErrorMessage("Invalid otp")
-//                    showErrorMessage("Error:  ${e.message}")
                 }
             })
     }

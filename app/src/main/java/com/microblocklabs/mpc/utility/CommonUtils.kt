@@ -5,7 +5,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.os.Build
+import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.WindowManager
@@ -13,6 +16,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.material.snackbar.Snackbar
 import com.microblocklabs.mpc.R
+import dmax.dialog.BuildConfig
 import java.util.regex.Pattern
 
 object CommonUtils {
@@ -81,5 +85,19 @@ object CommonUtils {
         clipboard.setPrimaryClip(clip)
         showToastMessage(context, context.resources.getString(R.string.copy_to_clip))
     }
+
+    fun getAppName(context: Context): String? {
+        var applicationInfo: ApplicationInfo? = null
+        try {
+            applicationInfo = context.packageManager.getApplicationInfo(context.applicationInfo.packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.d("TAG", "The package with the given name cannot be found on the system.")
+        }
+        return (if (applicationInfo != null) context.packageManager.getApplicationLabel(applicationInfo).toString() else "Unknown")
+    }
+
+    fun getAppVersionName(): String? {
+        return BuildConfig.VERSION_NAME
+        }
 
 }
