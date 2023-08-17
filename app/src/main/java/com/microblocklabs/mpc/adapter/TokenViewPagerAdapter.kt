@@ -30,4 +30,5 @@ class TokenViewPagerAdapter(fm: FragmentManager, var tabCount: Int) : FragmentPa
             else -> "Tokens"
         }
     }
+
 }

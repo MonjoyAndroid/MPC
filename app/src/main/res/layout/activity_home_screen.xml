@@ -168,14 +168,16 @@
             android:layout_width="10dp"
             android:layout_height="match_parent"
             android:layout_marginStart="5dp"
-            android:src="@drawable/copy_icon"/>
+            android:tint="@color/base_primary"
+            android:src="@drawable/copy_icon"
+            tools:ignore="UseAppTint" />
 
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/wallet_view"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="250dp"
         app:cardElevation="10dp"
         app:cardCornerRadius="20dp"
         app:cardBackgroundColor="@color/card_color"
@@ -195,11 +197,10 @@
                 android:id="@+id/img_wallet_bg"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:paddingEnd="-20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:src="@drawable/wallet_bg_image" />
+                android:background="@drawable/wallet_bg_image" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/img_coin"
@@ -211,16 +212,45 @@
                 android:src="@drawable/cifdaq_white"/>
 
             <TextView
+                android:id="@+id/txt_cifd_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gilroy_medium"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:text="CIFD Price"
+                android:textColor="@color/grey"
+                android:textSize="15sp"
+                app:layout_constraintTop_toBottomOf="@+id/img_coin"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/txt_cifd_usd_value"
+                android:textStyle="normal" />
+
+            <TextView
+                android:id="@+id/txt_cifd_usd_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gilroy_medium"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:text="0.8 USD"
+                android:textColor="@color/base_primary"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txt_cifd_price"
+                android:textStyle="bold" />
+
+            <TextView
                 android:id="@+id/txt_unlock_balance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/gilroy_medium"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="5dp"
-                android:text="Unlock Balance"
+                android:text="Unlocked Balance"
                 android:textColor="@color/grey"
-                android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@+id/img_coin"
+                android:textSize="15sp"
+                app:layout_constraintTop_toBottomOf="@+id/txt_cifd_usd_value"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/txt_unlocked_amount"
                 android:textStyle="normal" />
@@ -232,7 +262,7 @@
                 android:fontFamily="@font/gilroy_medium"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="5dp"
-                android:text="0.0002223 CIFD"
+                android:text="0.000000 CIFD"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -246,7 +276,7 @@
                 android:fontFamily="@font/gilroy_medium"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="5dp"
-                android:text="$ 0.0018 USD"
+                android:text="$ 0.0000 USD"
                 android:textColor="@color/grey"
                 android:textSize="13sp"
                 app:layout_constraintStart_toStartOf="parent"
@@ -586,7 +616,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gilroy_medium"
                         android:layout_marginBottom="5dp"
-                        android:text="1.96 CIFD"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -600,7 +629,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gilroy_medium"
                         android:layout_marginTop="5dp"
-                        android:text="$ 1.568 USD"
                         android:textColor="@color/grey"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
@@ -644,7 +672,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gilroy_medium"
                         android:layout_marginBottom="5dp"
-                        android:text="2 CIFD"
                         android:textColor="@color/white"
                         android:textSize="18sp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -658,7 +685,6 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gilroy_medium"
                         android:layout_marginTop="5dp"
-                        android:text="$ 1.6 USD"
                         android:textColor="@color/grey"
                         android:textSize="12sp"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -728,11 +754,19 @@
 
 </androidx.core.widget.NestedScrollView>
 
+    <RelativeLayout
+        android:id="@+id/layout_glassy_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:background="@drawable/glass_morphism_background"/>
+
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
+        android:visibility="visible"
         android:fitsSystemWindows="false"
         app:headerLayout="@layout/header_navigation"
         app:menu="@menu/navigation_menu"

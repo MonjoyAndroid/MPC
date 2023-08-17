@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:layout_margin="20dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:layout_marginStart="20dp"
+    android:layout_marginEnd="20dp"
+    android:layout_marginTop="15dp"
+   android:layout_marginBottom="15dp"
     android:background="@color/black">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_activity"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:src="@drawable/cifdaq_green"
         tools:ignore="MissingConstraints" />
@@ -28,14 +31,32 @@
         android:textStyle="normal" />
 
     <TextView
-        android:id="@+id/activity_address"
+        android:id="@+id/activity_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/gilroy_medium"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
         android:textColor="@color/grey"
+        android:maxLines="1"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/img_activity"
+        app:layout_constraintTop_toBottomOf="@+id/activity_name"
+        android:textStyle="normal"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/activity_address"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/gilroy_medium"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/grey"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/activity_name"
         android:textStyle="normal"
         tools:ignore="MissingConstraints" />
@@ -68,16 +89,49 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/activity_changes"
+        android:id="@+id/txt_transaction_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/gilroy_medium"
-        android:text="$3454 USD"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:text="Transaction Id:"
         android:textColor="@color/grey"
+        android:maxLines="1"
         android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/activity_amount"
-        android:textStyle="normal" />
+        app:layout_constraintStart_toEndOf="@+id/img_activity"
+        app:layout_constraintTop_toBottomOf="@+id/activity_date"
+        android:textStyle="normal"
+        tools:ignore="MissingConstraints" />
+
+    <TextView
+        android:id="@+id/transaction_hash"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/gilroy_medium"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:autoLink="web"
+        android:textColor="@color/light_blue_900"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:textSize="13sp"
+        app:layout_constraintStart_toEndOf="@+id/txt_transaction_id"
+        app:layout_constraintTop_toBottomOf="@+id/activity_date"
+        android:textStyle="normal"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/img_copy_trans_hash"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:padding="5dp"
+        android:tint="@color/base_primary"
+        android:src="@drawable/copy_icon"
+        app:layout_constraintStart_toEndOf="@+id/transaction_hash"
+        app:layout_constraintTop_toBottomOf="@+id/activity_date"
+        tools:ignore="MissingConstraints,UseAppTint" />
+
 
     <View
         android:layout_width="match_parent"

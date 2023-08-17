@@ -39,7 +39,6 @@ message FindUserByMnemonicPhraseResponse {
   repeated WalletEntry wallet = 7;
   bool newUser = 8;
   string mnemonic = 9;
-  string message = 10;
 }
 
 message WalletSharePart {
@@ -53,10 +52,10 @@ message WalletEntry {
   string ethereumAddress = 3;
   string publickey = 4;
   WalletSharePart sharepart = 5;
-  int32 TwoPercent = 6;
-  int32 RestValue = 7;
-  int32 PerMonth = 8;
-  int32 Cifd = 9;
+  double TwoPercent = 6;
+  double RestValue = 7;
+  double PerMonth = 8;
+  double Cifd = 9;
   string uniqueId = 10;
   bool ifUniqueId = 11;
 }

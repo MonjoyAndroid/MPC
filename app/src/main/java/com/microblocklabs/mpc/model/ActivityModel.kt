@@ -1,9 +1,12 @@
 package com.microblocklabs.mpc.model
 
 data class ActivityModel(
-    var activityIcon : Int,
+//    var activityIcon : Int,
     var activityName : String,
-    var activityaddress : String,
+    var dateStr : String,
+    var activitySenderAddress : String,
+    var activityReceiverAddress : String,
     var activityAmount : String,
-    var activityChanges : String
+    var transactionHash : String
+
 )

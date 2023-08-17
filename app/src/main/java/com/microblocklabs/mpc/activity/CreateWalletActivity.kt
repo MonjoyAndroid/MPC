@@ -3,7 +3,11 @@ package com.microblocklabs.mpc.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.util.Log
@@ -23,6 +27,7 @@ import com.microblocklabs.mpc.room.viewmodel.SharePartViewModel
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
 import com.microblocklabs.mpc.room.viewmodel.WalletDetailsViewModel
 import com.microblocklabs.mpc.utility.CommonUtils
+import com.microblocklabs.mpc.utility.NetworkUtils
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -51,29 +56,19 @@ class CreateWalletActivity : BaseActivity() {
         }
 
         binding.imgInfoUniqueId.setOnClickListener {
-            if(showInfoPop==null){
-                showInfoPop = showInfoPopup()
-                showInfoPop?.isOutsideTouchable = false
-                showInfoPop?.isFocusable = false
+            showInfoPop = showInfoPopup()
+            showInfoPop?.isOutsideTouchable = true
+            showInfoPop?.isFocusable = false
 //            showInfoPop?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                showInfoPop?.showAsDropDown(binding.imgInfoUniqueId, -760, 10)
-                binding.imgInfoUniqueId.background = resources.getDrawable(R.drawable.info_icon)
-            }else{
-                dismissShowInfoPopup()
-            }
+            showInfoPop?.showAsDropDown(binding.imgInfoUniqueId, -760, 10)
         }
 
         binding.imgInfoPass.setOnClickListener {
-            if(showInfoPop==null){
-                showInfoPop = showPassSuggestionPopup()
-                showInfoPop?.isOutsideTouchable = false
-                showInfoPop?.isFocusable = false
+            showInfoPop = showPassSuggestionPopup()
+            showInfoPop?.isOutsideTouchable = true
+            showInfoPop?.isFocusable = false
 //            showInfoPop?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                showInfoPop?.showAsDropDown(binding.imgInfoPass, -760, 10)
-                binding.imgInfoPass.background = resources.getDrawable(R.drawable.info_icon)
-            }else{
-                dismissPassSuggestionPopup()
-            }
+            showInfoPop?.showAsDropDown(binding.imgInfoPass, -760, 10)
         }
 
         binding.imgShowHidePass.setOnClickListener {
@@ -111,6 +106,51 @@ class CreateWalletActivity : BaseActivity() {
 //            Toast.makeText(this, "$countryName, $countryCode, $countryCodeName, $countryCodeWithPlus", Toast.LENGTH_SHORT).show()
 
         }
+
+        binding.etEmail.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
+
+        binding.etPassword.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
+
+        binding.etConfirmPassword.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
     }
 
     private fun showHidePass(showHideFor: String) {
@@ -119,12 +159,12 @@ class CreateWalletActivity : BaseActivity() {
                 if(binding.imgShowHidePass.contentDescription == "Show"){
                     //Show Password
                     binding.imgShowHidePass.contentDescription = "Hide"
-                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
                     binding.etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 }else{
                     //Hide Password
                     binding.imgShowHidePass.contentDescription = "Show"
-                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etPassword.setSelection(binding.etPassword.length())
@@ -132,11 +172,11 @@ class CreateWalletActivity : BaseActivity() {
             "ShowConfirmPass" -> {
                 if (binding.imgShowHideConfirmPass.contentDescription == "Show") {
                     binding.imgShowHideConfirmPass.contentDescription = "Hide"
-                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_hide)
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_show)
                     binding.etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 } else {
                     binding.imgShowHideConfirmPass.contentDescription = "Show"
-                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_show)
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etConfirmPassword.setSelection(binding.etConfirmPassword.length())
@@ -191,7 +231,7 @@ class CreateWalletActivity : BaseActivity() {
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            showWarningMessage("Invalid Email id")
+            CommonUtils.alertDialog(this, "Invalid Email id")
             return
         }
 //        else if(phoneWithoutCountryCode.length<10){
@@ -206,20 +246,24 @@ class CreateWalletActivity : BaseActivity() {
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            showWarningMessage("Password is not valid")
+            CommonUtils.alertDialog(this, "Password is not valid")
             return
         }else if(password != confirmPassword){
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            showWarningMessage("Password and Confirm Password are not matching")
+            CommonUtils.alertDialog(this, "Password and Confirm Password are not matching")
             return
         }else{
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-//            showMessage("Success fully Done")
-            requestForRegisterUser(email, phone, password, uniqueID)
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForRegisterUser(email, phone, password, uniqueID)
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
+
         }
     }
 
@@ -263,7 +307,7 @@ class CreateWalletActivity : BaseActivity() {
     }
 
     private fun requestForRegisterUser(email: String, phone: String, password: String, uniqueID: String) {
-
+        
         val signUpService = SignUpServiceGrpc.newBlockingStub(connectionChannel)
 
         val requestMessage = Signup.SignUpRequest.newBuilder()
@@ -281,18 +325,7 @@ class CreateWalletActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Signup.SignUpResponse> {
                 override fun onSuccess(response: Signup.SignUpResponse) {
                     dismissLoadingDialog()
-
-                    Log.d("MyResponse", response.toString())
-
-
-
-//                    if (response.responseCode == HttpResponseCode.SUCCESS) {
-//                        showMessage("Sign Up Successfully")
-//                        finish()
-//                    } else {
-//                        showErrorMessage(response.message)
-//                    }
-
+//                    Log.d("MyResponse", response.toString())
                     saveUserData(response)
 
 
@@ -307,7 +340,7 @@ class CreateWalletActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@CreateWalletActivity, displayMsg)
                 }
             })
     }

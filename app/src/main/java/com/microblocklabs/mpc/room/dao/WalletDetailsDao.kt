@@ -18,6 +18,9 @@ interface WalletDetailsDao {
 // @Query("UPDATE UserProfileDetails SET UserPassword = :newPassword WHERE UserId LIKE :userId ")
 //    fun updateUserPassword(userId: String,newPassword:String)
 //
+    @Query("SELECT * FROM WalletDetails WHERE Email= :email AND AccountName=:accountName ")
+    fun getWalletDataByAccount(email: String, accountName: String): WalletDetails
+
     @Query("SELECT * FROM WalletDetails")
     fun getWalletList(): List<WalletDetails>
 

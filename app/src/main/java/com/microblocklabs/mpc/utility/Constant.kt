@@ -6,6 +6,7 @@ object Constant {
     const val baseURL1Key = "BaseURL1"
     const val baseURL2Key = "BaseURL2"
     const val UserID = "UserID"
+    const val SessionToken = "SessionToken"
     const val ClientName = "ClientName"
     const val RegisterType = "RegisterType"
     const val AOMTrial = "AOMTrial"

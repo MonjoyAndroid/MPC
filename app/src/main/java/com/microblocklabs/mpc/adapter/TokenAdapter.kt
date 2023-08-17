@@ -30,10 +30,10 @@ class TokenAdapter(private val mList: List<TokenModel>) : RecyclerView.Adapter<T
         // sets the image to the imageview from our itemHolder class
         holder.imageView.setImageResource(itemsViewModel.tokenIcon)
         holder.tvCoinName.text = itemsViewModel.tokenName
-        holder.tvCoinVolume.text = itemsViewModel.tokenVolume
-        holder.tvCoinAmount.text = itemsViewModel.tokenAmount
+//        holder.tvCoinVolume.text = itemsViewModel.tokenVolume
+//        holder.tvCoinAmount.text = itemsViewModel.tokenAmount
         holder.tvCoinPrice.text = itemsViewModel.tokenPrice
-        holder.tvCoinChanges.text = itemsViewModel.tokenChanges
+//        holder.tvCoinChanges.text = itemsViewModel.tokenChanges
     }
 
     // return the number of the items in the list
@@ -45,9 +45,9 @@ class TokenAdapter(private val mList: List<TokenModel>) : RecyclerView.Adapter<T
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
         val imageView: ImageView = itemView.findViewById(R.id.img_coin)
         val tvCoinName: TextView = itemView.findViewById(R.id.coin_name)
-        val tvCoinVolume: TextView = itemView.findViewById(R.id.coin_volume)
-        val tvCoinAmount: TextView = itemView.findViewById(R.id.coin_amount)
+//        val tvCoinVolume: TextView = itemView.findViewById(R.id.coin_volume)
+//        val tvCoinAmount: TextView = itemView.findViewById(R.id.coin_amount)
         val tvCoinPrice: TextView = itemView.findViewById(R.id.coin_price)
-        val tvCoinChanges: TextView = itemView.findViewById(R.id.coin_changes)
+//        val tvCoinChanges: TextView = itemView.findViewById(R.id.coin_changes)
     }
 }

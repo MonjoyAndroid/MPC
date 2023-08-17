@@ -1,22 +1,34 @@
 package com.microblocklabs.mpc.utility
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.Log
 import android.util.Patterns
 import android.view.View
+import android.view.Window
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.material.snackbar.Snackbar
 import com.microblocklabs.mpc.R
+import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import dmax.dialog.BuildConfig
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.regex.Pattern
 
 object CommonUtils {
@@ -42,6 +54,12 @@ object CommonUtils {
 
     fun isPasswordValidate(passwordInput: String?): Boolean {
         return PASSWORD_PATTERN.matcher(passwordInput.toString()).matches()
+    }
+
+    fun isValidEthereumAddress(address: String): Boolean {
+        // Ethereum address should be 40 characters long and start with '0x'
+        val ethereumAddressRegex = "^0x[a-fA-F0-9]{40}$"
+        return address.matches(ethereumAddressRegex.toRegex())
     }
 
     fun goToNextScreenWithoutFinish(cls: Class<*>?, ct: Context) {
@@ -86,6 +104,20 @@ object CommonUtils {
         showToastMessage(context, context.resources.getString(R.string.copy_to_clip))
     }
 
+    fun convertDecimalUptoFourDigits(decimalVal: Double): Double{
+        val df = DecimalFormat("#.####")
+        df.roundingMode = RoundingMode.CEILING
+        val roundoff = df.format(decimalVal.toDouble())
+        return roundoff.toDouble()
+    }
+
+    fun convertDecimalUptoSixDigits(decimalVal: Double): Double{
+        val df = DecimalFormat("#.######")
+        df.roundingMode = RoundingMode.DOWN
+        val roundoff = df.format(decimalVal.toDouble())
+        return roundoff.toDouble()
+    }
+
     fun getAppName(context: Context): String? {
         var applicationInfo: ApplicationInfo? = null
         try {
@@ -99,5 +131,60 @@ object CommonUtils {
     fun getAppVersionName(): String? {
         return BuildConfig.VERSION_NAME
         }
+
+    fun getCurrentDate(format: String?): String? {
+        val c31 = Calendar.getInstance()
+        val sdf31 = SimpleDateFormat(format, Locale.ENGLISH)
+        return sdf31.format(c31.time)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun getTimeSimple(date: Date?): String? {
+        val dateFormat = SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
+        return dateFormat.format(date!!)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    fun convertDateFormat(inputDateString: String): String {
+        val inputFormat = SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.ENGLISH) // Input format
+        val outputFormat = SimpleDateFormat("dd/MM/yyyy h:mm:ss a", Locale.ENGLISH) // Desired output format
+
+        val date: Date = inputFormat.parse(inputDateString) as Date
+        return outputFormat.format(date)
+    }
+
+    fun alertDialog(context: Context?, msg: String?) {
+        var message = msg
+        message = message?.replace("\r".toRegex(), "\n") ?: ""
+        val dialog = Dialog(context!!)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_alert_dialog)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        val text = dialog.findViewById<TextView>(R.id.txtDisplayName)
+        text.text = message
+        val okButton = dialog.findViewById<TextView>(R.id.button_ok)
+        okButton.setOnClickListener { dialog.dismiss() }
+    }
+
+    fun functionalAlertDialog(context: Context?, callingPurpose:String?, msg: String?, iAlertDialogButtonClickListener: IAlertDialogButtonClickListener) {
+        var message = msg
+        message = message?.replace("\r".toRegex(), "\n") ?: ""
+        val dialog = Dialog(context!!)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_alert_dialog)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        val text = dialog.findViewById<TextView>(R.id.txtDisplayName)
+        text.text = message
+        val okButton = dialog.findViewById<TextView>(R.id.button_ok)
+        okButton.setOnClickListener {
+            dialog.dismiss()
+            iAlertDialogButtonClickListener.onPositiveButtonClick(callingPurpose)
+        }
+    }
+
 
 }

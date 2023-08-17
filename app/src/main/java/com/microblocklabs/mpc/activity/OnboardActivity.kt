@@ -32,6 +32,7 @@ class OnboardActivity : BaseActivity() {
         setCurrentIndicator(0)
     }
 
+
     private fun setOnBoardingItems(){
         onboardingItemAdapter = OnBoardingItemsAdapter(
             listOf(
@@ -82,7 +83,7 @@ class OnboardActivity : BaseActivity() {
 
     private fun navigateToWalletSetup(){
         startActivity(Intent(applicationContext, WalletSetupActivity::class.java))
-        finish()
+//        finish()
     }
 
     private fun navigateToHomeScreen(){

@@ -5,13 +5,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityLoginBinding
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
+import com.microblocklabs.mpc.utility.CommonUtils
 import com.microblocklabs.mpc.utility.Constant
+import com.microblocklabs.mpc.utility.NetworkUtils
+import io.grpc.CallOptions
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -45,7 +47,11 @@ class LoginActivity : BaseActivity() {
         }
 
         binding.buttonUnlock.setOnClickListener{
-            requestForLogin(userProfile!![0].email, binding.etPassword.text.toString())
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForLogin(userProfile!![0].email, binding.etPassword.text.toString())
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
         }
 
 
@@ -60,25 +66,70 @@ class LoginActivity : BaseActivity() {
         if(binding.imgShowHidePass.contentDescription == "Show"){
             //Show Password
             binding.imgShowHidePass.contentDescription = "Hide"
-            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
+            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
             binding.etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
         }else{
             //Hide Password
             binding.imgShowHidePass.contentDescription = "Show"
-            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
+            binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
             binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
         }
         binding.etPassword.setSelection(binding.etPassword.length())
     }
 
+//    private fun requestForLogin(email: String, password: String) {
+//        if (email.isEmpty() or password.isEmpty()) {
+//            showWarningMessage(resources.getString(com.microblocklabs.mpc.R.string.enter_password))
+//            return
+//        }
+//
+//        val loginService = LoginServiceGrpc.newBlockingStub(connectionChannel)
+//
+//        val requestMessage = LoginRequest.newBuilder()
+//            .setEmail(email)
+//            .setPassword(password)
+//            .build()
+//
+//        showLoadingDialog()
+//
+//        Single.fromCallable { loginService.login(requestMessage) }
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(object : SingleObserver<Login.LoginResponse> {
+//                override fun onSuccess(response: Login.LoginResponse) {
+//                    dismissLoadingDialog()
+//                    if (response.success) {
+//                        saveLoginData(response)
+//                    } else {
+//                        showErrorMessage(response.error)
+//                    }
+//
+//                }
+//
+//                override fun onSubscribe(d: Disposable) {}
+//
+//                override fun onError(e: Throwable) {
+//                    val displayMsg =if(e.message.toString().contains(":")){
+//                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+//                    }else{
+//                        e.message.toString()
+//                    }
+//                    dismissLoadingDialog()
+//                    showErrorMessage(displayMsg)
+//                }
+//            })
+//    }
+
+
     private fun requestForLogin(email: String, password: String) {
         if (email.isEmpty() or password.isEmpty()) {
-            showWarningMessage(resources.getString(com.microblocklabs.mpc.R.string.enter_password))
+            CommonUtils.alertDialog(this, resources.getString(R.string.enter_password))
+//            showWarningMessage(resources.getString(R.string.enter_password))
             return
         }
 
-        val loginService = LoginServiceGrpc.newBlockingStub(connectionChannel)
-
+        val loginService = LoginServiceGrpc.newBlockingStub(connectionChannelWithInterceptorForLogin)
+        val metaDataKey = CallOptions.Key.create<String>("my_key")
         val requestMessage = LoginRequest.newBuilder()
             .setEmail(email)
             .setPassword(password)
@@ -95,7 +146,7 @@ class LoginActivity : BaseActivity() {
                     if (response.success) {
                         saveLoginData(response)
                     } else {
-                        showErrorMessage(response.error)
+                        CommonUtils.alertDialog(this@LoginActivity, response.error)
                     }
 
                 }
@@ -109,13 +160,14 @@ class LoginActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@LoginActivity, displayMsg)
                 }
             })
     }
 
     private fun saveLoginData(response: Login.LoginResponse){
         mpcSharedPref.save(Constant.UserID, response.userId)
+        mpcSharedPref.save(Constant.SessionToken, response.token)
         startHomeActivity()
     }
 

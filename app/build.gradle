@@ -102,8 +102,13 @@ dependencies {
     implementation "androidx.room:room-runtime:2.5.2"
     kapt "androidx.room:room-compiler:2.5.2"
     implementation "androidx.room:room-ktx:2.5.2"
+    //  web3j library
+    implementation 'org.web3j:core:5.0.0'
 
     //  QR code generator library
     implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+    //  Glass morphism library
+    implementation 'jp.wasabeef:blurry:4.0.1'
+
     
 }

@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -11,6 +13,8 @@ import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityOtpverificationBinding
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
+import com.microblocklabs.mpc.utility.CommonUtils
+import com.microblocklabs.mpc.utility.NetworkUtils
 import confirmUser.ConfirmUser
 import confirmUser.ConfirmUserServiceGrpc
 import io.reactivex.Single
@@ -18,8 +22,6 @@ import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import login.Login
-import login.LoginServiceGrpc
 import resendVerify.ResendVerify
 import resendVerify.ResendVerifyServiceGrpc
 
@@ -55,20 +57,40 @@ class OTPVerificationActivity : BaseActivity() {
 
 
         binding.tvSendOtp.setOnClickListener{
-            if(isRunning){
-                resetOtpTimer()
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForSendOTP(binding.etEmail.text.toString())
             }else{
-                setOtpTimer()
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
             }
-            requestForSendOTP(binding.etEmail.text.toString())
         }
 
         binding.buttonVerify.setOnClickListener{
-            requestForVerifyOTP(binding.etEmail.text.toString(), binding.etEmailOtp.text.toString()) //For Email otp
-//            requestForVerifyOTP(binding.etMobile.text.toString(), binding.etMobOtp.text.toString()) //For mobile otp
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForVerifyOTP(binding.etEmail.text.toString(), binding.etEmailOtp.text.toString()) //For Email otp
+//                requestForVerifyOTP(binding.etMobile.text.toString(), binding.etMobOtp.text.toString()) //For mobile otp
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
+
 //            setNavigationValueForNextScreen(true)
         }
-        showWarningMessage(resources.getString(R.string.otp_send_msg))
+
+        CommonUtils.alertDialog(this, resources.getString(R.string.otp_send_msg))
+
+        binding.etEmailOtp.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
     }
 
 
@@ -96,17 +118,20 @@ class OTPVerificationActivity : BaseActivity() {
             override fun onFinish() {
                 countdownTimer.cancel()
                 isRunning = false
-                showMessage(resources.getString(R.string.otp_expired_msg))
+                binding.tvOtpTimer.visibility = View.GONE
+                CommonUtils.alertDialog(this@OTPVerificationActivity, resources.getString(R.string.otp_expired_msg))
             }
         }
         countdownTimer.start()
         isRunning = true
+        binding.tvOtpTimer.visibility = View.VISIBLE
     }
 
     private fun resetOtpTimer(){
         timeInMiliSeconds = startMiliSeconds
         countdownTimer.cancel()
         isRunning = false
+        binding.tvOtpTimer.visibility = View.GONE
         setOtpTimer()
         updateTimerUI()
     }
@@ -122,6 +147,7 @@ class OTPVerificationActivity : BaseActivity() {
         super.onDestroy()
         countdownTimer.cancel()
         isRunning = false
+        binding.tvOtpTimer.visibility = View.GONE
     }
 
     private fun requestForSendOTP(email: String) {
@@ -137,9 +163,12 @@ class OTPVerificationActivity : BaseActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : SingleObserver<ResendVerify.VerificationResponse> {
                 override fun onSuccess(response: ResendVerify.VerificationResponse) {
-//                    dismissLoadingDialog()
-//                    val isVerified = response.message.equals("Verification code resent successfully")
-                    showMessage(response.message)
+                    if(isRunning){
+                        resetOtpTimer()
+                    }else{
+                        setOtpTimer()
+                    }
+                    CommonUtils.alertDialog(this@OTPVerificationActivity, resources.getString(R.string.otp_send_msg))
                 }
 
                 override fun onSubscribe(d: Disposable) {}
@@ -151,7 +180,7 @@ class OTPVerificationActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@OTPVerificationActivity, displayMsg)
                 }
             })
     }
@@ -159,12 +188,12 @@ class OTPVerificationActivity : BaseActivity() {
     private fun requestForVerifyOTP(email: String, otp: String) {
         if (email.isEmpty() or otp.isEmpty()) {
             binding.etEmailOtp.background = ContextCompat.getDrawable(applicationContext, R.drawable.bg_border_red)
-            showWarningMessage(resources.getString(R.string.please_enter_otp))
+            CommonUtils.alertDialog(this, resources.getString(R.string.please_enter_otp))
             return
         }
 
         if(!isRunning){
-            showWarningMessage(resources.getString(R.string.otp_expired_msg))
+            CommonUtils.alertDialog(this, resources.getString(R.string.otp_expired_msg))
             return
         }
 
@@ -201,7 +230,7 @@ class OTPVerificationActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@OTPVerificationActivity, displayMsg)
                     setNavigationValueForNextScreen(false)
                 }
             })

@@ -7,8 +7,7 @@ message TransactionRequest {
   string senderAddress = 2;
   string receiverAddress = 3;
   string token = 4;
-  string userid = 5;
-  Share sharepart = 6;
+  Share sharepart = 5;
 }
 message Share {
   string x = 1;
@@ -17,8 +16,10 @@ message Share {
 
 message TransactionResponse {
   string transactionHash = 1;
-  string status = 2;
-  optional string error = 3;
+  string from = 2;
+  string to = 3;
+  string value = 4;
+  string createdAt = 5;
 }
 
 service SendTransactionService {

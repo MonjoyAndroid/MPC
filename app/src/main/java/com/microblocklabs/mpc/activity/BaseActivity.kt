@@ -6,11 +6,14 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.microblocklabs.mpc.room.MPCDatabase
 import aot.armsproject.utils.AppSharedPreferenceManager
 import com.microblocklabs.mpc.R
+import com.microblocklabs.mpc.interceptor.GrpcClientRequestInterceptor
+import com.microblocklabs.mpc.interceptor.GrpcClientResponseInterceptor
+import com.microblocklabs.mpc.room.MPCDatabase
 import dmax.dialog.SpotsDialog
 import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
 import io.grpc.okhttp.OkHttpChannelBuilder
 import kotlin.properties.Delegates
 
@@ -20,15 +23,28 @@ open class BaseActivity : AppCompatActivity() {
     lateinit var mpcSharedPref: AppSharedPreferenceManager
     lateinit var db: MPCDatabase
 
+
     val connectionChannel: ManagedChannel by lazy{
-//        OkHttpChannelBuilder.forAddress("127.0.0.1", 50051)
+
+//        OkHttpChannelBuilder.forAddress("54.145.255.3", 50051) // Test
 //            .usePlaintext()
 //            .build()
 
-        OkHttpChannelBuilder.forAddress("54.145.255.3", 50051)
+        OkHttpChannelBuilder.forAddress("34.201.39.208", 50051) // Production
             .usePlaintext()
             .build()
     }
+
+    val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress("34.201.39.208", 50051)
+//     val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress("54.145.255.3", 50051)
+        .usePlaintext()
+        .build()!!
+
+    val connectionChannelWithInterceptorForLogin  = ManagedChannelBuilder.forAddress("34.201.39.208", 50051)
+//    val connectionChannelWithInterceptorForLogin  = ManagedChannelBuilder.forAddress("54.145.255.3", 50051)
+        .intercept(GrpcClientResponseInterceptor())
+        .usePlaintext()
+        .build()!!
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

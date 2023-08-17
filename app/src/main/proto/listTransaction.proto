@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package listTransaction;
+
+message ListTransactionRequest {
+  string limit = 1;
+  string skip = 2;
+  string myAddress = 3;
+}
+
+message Transaction {
+  string from = 1;
+  string to = 2;
+  string value = 3;
+  string hash = 4;
+  string createdAt = 5;
+}
+
+message ListTransactionResponse {
+  repeated Transaction transactions = 1;
+}
+
+service TransactionService {
+  rpc ListTransaction(ListTransactionRequest) returns (ListTransactionResponse);
+}

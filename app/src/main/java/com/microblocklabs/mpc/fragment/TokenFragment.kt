@@ -1,5 +1,6 @@
 package com.microblocklabs.mpc.fragment
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,14 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.microblocklabs.mpc.R
+import com.microblocklabs.mpc.activity.HomeScreenActivity
 import com.microblocklabs.mpc.adapter.TokenAdapter
-import com.microblocklabs.mpc.databinding.ActivityHomeScreenBinding
 import com.microblocklabs.mpc.databinding.FragmentTokenBinding
+import com.microblocklabs.mpc.interfaces.OnTokenDataReceivedListener
+import com.microblocklabs.mpc.model.BalanceDetails
 import com.microblocklabs.mpc.model.TokenModel
+import com.microblocklabs.mpc.utility.CommonUtils
 
-class TokenFragment : Fragment() {
+class TokenFragment : Fragment(), OnTokenDataReceivedListener {
     private lateinit var binding: FragmentTokenBinding
     private lateinit var tokenList: ArrayList<TokenModel>
+    private lateinit var myActivity: HomeScreenActivity
+    private var balanceDetails: BalanceDetails? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +36,11 @@ class TokenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupData()
+        myActivity = activity as HomeScreenActivity
+        myActivity.setTokenDataListener(this)
+        if(balanceDetails != null){
+            onTokenDataReceived(requireContext(),balanceDetails!!)
+        }
     }
 
     private fun setupData() {
@@ -49,15 +59,20 @@ class TokenFragment : Fragment() {
 
     private fun populateData() {
         tokenList = ArrayList<TokenModel>()
-        tokenList.add(TokenModel(R.drawable.cifdaq_green, "CIFD TOKEN", "0.267", "$27650.30", "$3226.90", "+3.45%"))
-        tokenList.add(TokenModel(R.drawable.bitcoin, "Bitcoin", "0.267", "$27650.30", "$3226.90", "+3.45%"))
-        tokenList.add(TokenModel(R.drawable.ethereum1, "Ethereum", "0.267", "$27650.30", "$3226.90", "+3.45%"))
-        tokenList.add(TokenModel(R.drawable.binance, "Binance Coin", "0.267", "$27650.30", "$3226.90", "+3.45%"))
+        tokenList.add(TokenModel(R.drawable.cifdaq_green, "CIFD TOKEN", "0.267", "$27650.30","${CommonUtils.convertDecimalUptoSixDigits(balanceDetails!!.balance)} CIFD", "+3.45%"))
+//        tokenList.add(TokenModel(R.drawable.bitcoin, "Bitcoin", "0.267", "$27650.30", "$3226.90", "+3.45%"))
+//        tokenList.add(TokenModel(R.drawable.ethereum1, "Ethereum", "0.267", "$27650.30", "$3226.90", "+3.45%"))
+//        tokenList.add(TokenModel(R.drawable.binance, "Binance Coin", "0.267", "$27650.30", "$3226.90", "+3.45%"))
 
         val adapter = TokenAdapter(tokenList)
         binding.recyclerToken.layoutManager = LinearLayoutManager(requireContext())
         // Setting the Adapter with the recyclerview
         binding.recyclerToken.adapter = adapter
+    }
+
+    override fun onTokenDataReceived(context: Context, balanceDetails: BalanceDetails) {
+        this.balanceDetails = balanceDetails
+        setupData()
     }
 
 

@@ -21,15 +21,12 @@ import com.microblocklabs.mpc.room.viewmodel.SharePartViewModel
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
 import com.microblocklabs.mpc.room.viewmodel.WalletDetailsViewModel
 import com.microblocklabs.mpc.utility.CommonUtils
+import com.microblocklabs.mpc.utility.NetworkUtils
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import resendVerify.ResendVerify
-import resendVerify.ResendVerifyServiceGrpc
-import signup.SignUpServiceGrpc
-import signup.Signup
 import java.util.Random
 import kotlin.math.ceil
 
@@ -87,7 +84,12 @@ class PhraseRecoveryActivity : BaseActivity() {
         }
 
         val nMonicString = convertListToSpaceSeparatedString(enteredPhraseList)
-        getUserDetailsByMnemonicPhrase(nMonicString)
+        if(NetworkUtils.isNetworkConnected(this)){
+            getUserDetailsByMnemonicPhrase(nMonicString)
+        }else{
+            CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+        }
+
     }
 
     private fun convertListToSpaceSeparatedString(enteredPhraseList: ArrayList<String>): String{
@@ -139,7 +141,7 @@ class PhraseRecoveryActivity : BaseActivity() {
                 override fun onSuccess(response: Cognito.ForgotPasswordResponse) {
                     dismissLoadingDialog()
 //                    Log.d("MyResponse", response.toString())
-                    showMessage(response.message)
+                    CommonUtils.alertDialog(this@PhraseRecoveryActivity, response.message)
                     showChangePasswordScreen()
                 }
 
@@ -152,7 +154,7 @@ class PhraseRecoveryActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@PhraseRecoveryActivity, displayMsg)
                 }
             })
     }
@@ -166,7 +168,8 @@ class PhraseRecoveryActivity : BaseActivity() {
 
     private fun prepareDataForShowPhrase(){
         val isEditMode = false
-        binding.titleSecretRecovery.text = resources.getString(R.string.secret_recovery)
+//        binding.titleSecretRecovery.text = resources.getString(R.string.secret_recovery)
+        binding.descSecretRecovery.text = resources.getString(R.string.secret_recovery_desc)
         binding.txtCopyToClip.visibility = View.VISIBLE
         var phraseList: List<String> = ArrayList<String>()
         userProfile = db.mUserProfileDao()!!.getUserProfile()
@@ -202,7 +205,8 @@ class PhraseRecoveryActivity : BaseActivity() {
 
     private fun prepareDataForEnterPhrase(){
         val isEditMode = true
-        binding.titleSecretRecovery.text = resources.getString(R.string.enter_phrase_title)
+//        binding.titleSecretRecovery.text = resources.getString(R.string.enter_phrase_title)
+        binding.descSecretRecovery.text = resources.getString(R.string.enter_secret_recovery_desc)
         binding.txtCopyToClip.visibility = View.GONE
 
         val max = 12
@@ -299,7 +303,7 @@ class PhraseRecoveryActivity : BaseActivity() {
 
     private fun getUserDetailsByMnemonicPhrase(mnemonicPhrase: String) {
         if (mnemonicPhrase.trim().isEmpty()) {
-            showWarningMessage(resources.getString(com.microblocklabs.mpc.R.string.please_enter_phrase))
+            CommonUtils.alertDialog(this, resources.getString(R.string.please_enter_phrase))
             return
         }
 
@@ -334,7 +338,7 @@ class PhraseRecoveryActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@PhraseRecoveryActivity, displayMsg)
                 }
             })
     }
@@ -342,9 +346,13 @@ class PhraseRecoveryActivity : BaseActivity() {
     private fun checkEmailValidityByPhrase(response : Cognito.FindUserByMnemonicPhraseResponse){
         userProfile = db.mUserProfileDao()!!.getUserProfile()
         if(response.email == userProfile[0].email){
-            requestForSendOTP(userProfile[0].email)
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForSendOTP(userProfile[0].email)
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
         }else{
-           showMessage("Please enter key phrases for your account")
+            CommonUtils.alertDialog(this, resources.getString(R.string.user_not_found_by_phrase_msg))
         }
 
     }

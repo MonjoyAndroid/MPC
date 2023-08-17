@@ -20,7 +20,7 @@ class WalletBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var binding: FragmentWalletBottomSheetBinding
     private lateinit var accountList: ArrayList<AccountModel>
 
-    override fun onCreate(@Nullable savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.AppBottomSheetDialogTheme)
     }

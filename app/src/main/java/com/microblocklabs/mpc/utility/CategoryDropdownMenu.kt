@@ -41,7 +41,7 @@ class CategoryDropdownMenu(context: Context, networkList: List<NetworkItem>) : P
             )
         )
         rvCategory!!.addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
-        dropdownAdapter = CategoryDropdownAdapter(networkList)
+        dropdownAdapter = CategoryDropdownAdapter(context, networkList)
         rvCategory!!.setAdapter(dropdownAdapter)
         contentView = view
     }

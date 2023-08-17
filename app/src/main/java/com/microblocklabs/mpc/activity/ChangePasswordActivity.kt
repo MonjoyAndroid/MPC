@@ -6,9 +6,12 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.Editable
+import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.TextView
@@ -18,6 +21,7 @@ import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityChangePasswordBinding
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.utility.CommonUtils
+import com.microblocklabs.mpc.utility.NetworkUtils
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,26 +54,51 @@ class ChangePasswordActivity : BaseActivity() {
             }
         }
 
-        binding.tvSendOtp.setOnClickListener{
-            if(isRunning){
-                resetOtpTimer()
-            }else{
-                setOtpTimer()
+        binding.etEmailOtp.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) { }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
             }
-            requestForSendOTP(binding.etEmail.text.toString())
+        })
+
+        binding.etPassword.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) { }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
+
+        binding.etConfirmPassword.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(s: Editable?) { }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+            }
+        })
+
+        binding.tvSendOtp.setOnClickListener{
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForSendOTP(binding.etEmail.text.toString())
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
+
         }
 
         binding.imgInfoPass.setOnClickListener {
-            if(showInfoPop==null){
-                showInfoPop = showPassSuggestionPopup()
-                showInfoPop?.isOutsideTouchable = false
-                showInfoPop?.isFocusable = false
-//            showInfoPop?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                showInfoPop?.showAsDropDown(binding.imgInfoPass, -760, 10)
-                binding.imgInfoPass.background = resources.getDrawable(R.drawable.info_icon)
-            }else{
-                dismissPassSuggestionPopup()
-            }
+            showInfoPop = showPassSuggestionPopup()
+            showInfoPop?.isOutsideTouchable = true
+            showInfoPop?.isFocusable = false
+            showInfoPop?.showAsDropDown(binding.imgInfoPass, -760, 10)
         }
 
         binding.imgShowHidePass.setOnClickListener {
@@ -90,7 +119,7 @@ class ChangePasswordActivity : BaseActivity() {
             checkCredentialsValidation(email, emailOTP, password, confirmPassword)
 //            setNavigationValueForNextScreen(true)
         }
-        showWarningMessage(resources.getString(R.string.otp_send_msg))
+        CommonUtils.alertDialog(this, resources.getString(R.string.otp_send_msg))
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -135,20 +164,24 @@ class ChangePasswordActivity : BaseActivity() {
             binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            showWarningMessage("Password is not valid")
+            CommonUtils.alertDialog(this, resources.getString(R.string.password_not_valid))
             return
         }else if(password != confirmPassword){
             binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            showWarningMessage("Password and Confirm Password are not matching")
+            CommonUtils.alertDialog(this, resources.getString(R.string.pass_confirm_pass_not_matching))
             return
         }else{
             binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-//            showMessage("Success fully Done")
-            requestForChangePassword(email, emailOtp, password)
+            if(NetworkUtils.isNetworkConnected(this)){
+                requestForChangePassword(email, emailOtp, password)
+            }else{
+                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+            }
+
         }
     }
 
@@ -163,17 +196,20 @@ class ChangePasswordActivity : BaseActivity() {
             override fun onFinish() {
                 countdownTimer.cancel()
                 isRunning = false
-                showMessage(resources.getString(R.string.otp_expired_msg))
+                binding.tvOtpTimer.visibility = View.GONE
+                CommonUtils.alertDialog(this@ChangePasswordActivity, resources.getString(R.string.otp_expired_msg))
             }
         }
         countdownTimer.start()
         isRunning = true
+        binding.tvOtpTimer.visibility = View.VISIBLE
     }
 
     private fun resetOtpTimer(){
         timeInMiliSeconds = startMiliSeconds
         countdownTimer.cancel()
         isRunning = false
+        binding.tvOtpTimer.visibility = View.GONE
         setOtpTimer()
         updateTimerUI()
     }
@@ -209,12 +245,12 @@ class ChangePasswordActivity : BaseActivity() {
                 if(binding.imgShowHidePass.contentDescription == "Show"){
                     //Show Password
                     binding.imgShowHidePass.contentDescription = "Hide"
-                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
                     binding.etPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 }else{
                     //Hide Password
                     binding.imgShowHidePass.contentDescription = "Show"
-                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_show)
+                    binding.imgShowHidePass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etPassword.setSelection(binding.etPassword.length())
@@ -222,11 +258,11 @@ class ChangePasswordActivity : BaseActivity() {
             "ShowConfirmPass" -> {
                 if (binding.imgShowHideConfirmPass.contentDescription == "Show") {
                     binding.imgShowHideConfirmPass.contentDescription = "Hide"
-                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_hide)
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_show)
                     binding.etConfirmPassword.transformationMethod = HideReturnsTransformationMethod.getInstance()
                 } else {
                     binding.imgShowHideConfirmPass.contentDescription = "Show"
-                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_show)
+                    binding.imgShowHideConfirmPass.setBackgroundResource(R.drawable.icon_hide)
                     binding.etConfirmPassword.transformationMethod = PasswordTransformationMethod.getInstance()
                 }
                 binding.etConfirmPassword.setSelection(binding.etConfirmPassword.length())
@@ -238,6 +274,7 @@ class ChangePasswordActivity : BaseActivity() {
         super.onDestroy()
         countdownTimer.cancel()
         isRunning = false
+        binding.tvOtpTimer.visibility = View.GONE
     }
 
     private fun requestForSendOTP(email: String) {
@@ -254,7 +291,12 @@ class ChangePasswordActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Cognito.ForgotPasswordResponse> {
                 override fun onSuccess(response: Cognito.ForgotPasswordResponse) {
                     dismissLoadingDialog()
-                    showMessage(response.message)
+                    if(isRunning){
+                        resetOtpTimer()
+                    }else{
+                        setOtpTimer()
+                    }
+                    CommonUtils.alertDialog(this@ChangePasswordActivity, response.message)
                 }
 
                 override fun onSubscribe(d: Disposable) {}
@@ -266,14 +308,14 @@ class ChangePasswordActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@ChangePasswordActivity, displayMsg)
                 }
             })
     }
 
     private fun requestForChangePassword(email: String, emailOtp: String, password: String) {
         if(!isRunning){
-            showWarningMessage(resources.getString(R.string.otp_expired_msg))
+            CommonUtils.alertDialog(this, resources.getString(R.string.otp_expired_msg))
             return
         }
 
@@ -292,7 +334,7 @@ class ChangePasswordActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Cognito.ConfirmForgotPasswordResponse> {
                 override fun onSuccess(response: Cognito.ConfirmForgotPasswordResponse) {
                     dismissLoadingDialog()
-                    showMessage(response.message)
+                    CommonUtils.alertDialog(this@ChangePasswordActivity, response.message)
                     showLoginScreen()
                 }
 
@@ -305,7 +347,7 @@ class ChangePasswordActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    showErrorMessage(displayMsg)
+                    CommonUtils.alertDialog(this@ChangePasswordActivity, displayMsg)
                 }
             })
     }
