@@ -56,6 +56,10 @@ object CommonUtils {
         return PASSWORD_PATTERN.matcher(passwordInput.toString()).matches()
     }
 
+    fun isOTPValid(otp: String?): Boolean {
+        return otp!!.length == 4
+    }
+
     fun isValidEthereumAddress(address: String): Boolean {
         // Ethereum address should be 40 characters long and start with '0x'
         val ethereumAddressRegex = "^0x[a-fA-F0-9]{40}$"
@@ -160,6 +164,21 @@ object CommonUtils {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         dialog.setContentView(R.layout.custom_alert_dialog)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        val text = dialog.findViewById<TextView>(R.id.txtDisplayName)
+        text.text = message
+        val okButton = dialog.findViewById<TextView>(R.id.button_ok)
+        okButton.setOnClickListener { dialog.dismiss() }
+    }
+
+    fun alertDialogWithErrorMsg(context: Context?, msg: String?) {
+        var message = msg
+        message = message?.replace("\r".toRegex(), "\n") ?: ""
+        val dialog = Dialog(context!!)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_alert_dialog_with_error_msg)
         dialog.setCanceledOnTouchOutside(false)
         dialog.show()
         val text = dialog.findViewById<TextView>(R.id.txtDisplayName)

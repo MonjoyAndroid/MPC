@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep the entry point to your app's main class
+-keep public class com.microblocklabs.mpc.activity.SplashActivity
+
+# Keep the names of classes and fields that are used for reflection
+-keepclassmembers class * {
+    @android.annotation.SuppressLint *;
+}

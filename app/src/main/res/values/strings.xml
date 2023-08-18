@@ -11,8 +11,8 @@
     <string name="import_wallet">Import your wallet from secret phrase</string>
     <string name="create_wallet">Create a new wallet</string>
     <string name="first_slide_desc">Get ready to unlock the potential of your digital assets with CIFDAQ wallet. Lets make managing digital assets simple and convenient.</string>
-    <string name="first_slide_heading">Future Proof Crypto Wallet</string>
-    <string name="second_slide_heading">SECURE &amp; SAFE WALLET</string>
+    <string name="first_slide_heading">Future Proof Crypto \n Wallet</string>
+    <string name="second_slide_heading">SECURE &amp; SAFE \n WALLET</string>
     <string name="second_slide_desc">Welcome to CIFDAQ wallet. Trust, security and innovation - all at your fingertips as you embark on this thrilling crypto adventure.</string>
 
     <string name="next">NEXT</string>
@@ -33,7 +33,17 @@
     <string name="new_password">New password <font color='#FF0000'>*</font></string>
     <string name="enter_new_password">Enter new password</string>
     <string name="enter_confirm_password">Confirm password</string>
-    <string name="pass_suggestion_msg">Password must be at least 8 characters, It includes 1 uppercase, 1 lowercase, 1 special character and 1 numeric character</string>
+    <string name="pass_suggestion_msg">Password must be at least 8 characters. It includes 1 uppercase, 1 lowercase, 1 special character and 1 numeric character.</string>
+    <string name="pass_correction_msg">Password must be at least 8 characters. \n- 1 uppercase. \n- 1 lowercase. \n- 1 special character. \n- 1 numeric character.</string>
+    <string name="email_password_confirm_pass_wrong"> - Email is not valid. \n- Password is not valid. \n- Password and Confirm Password are not matching</string>
+    <string name="email_password_wrong"> - Email is not valid. \n- Password is not valid.</string>
+    <string name="pass_wrong_confirm_pass_not_match"> - Password is not valid. \n- Password and Confirm Password are not matching</string>
+    <string name="email_wrong_confirm_pass_not_match"> - Email is not valid. \n- Password and Confirm Password are not matching</string>
+    <string name="otp_suggestion">OTP should be 4 digit</string>
+    <string name="otp_pass_confirm_pass_wrong"> - OTP should be 4 digit.\n- Password is not valid. \n- Password and Confirm Password are not matching</string>
+    <string name="otp_pass_wrong"> - OTP should be 4 digit \n- Password is not valid.</string>
+    <string name="otp_wrong_confirm_pass_not_match"> - OTP should be 4 digit \n- Password and Confirm Password are not matching</string>
+
     <string name="unique_id_suggestion_msg">if you are already a part of CIFDAQ family then you would have received a Unique ID in the email</string>
     <string name="otp_timer">OTP expires in: </string>
     <string name="email">Email Address <font color='#FF0000'>*</font></string>
@@ -92,6 +102,7 @@
     <string name="not_another_account">You dont have another account so please create a new account</string>
     <string name="password_not_valid">Password is not valid</string>
     <string name="pass_confirm_pass_not_matching">Password and Confirm Password are not matching</string>
+    <string name="email_not_valid">Email is not valid</string>
 
     <string name="your_receiver_address_wrong">Your receiver address is wrong</string>
     <string name="you_cant_transfer_own_account">You can not transfer token into your own account</string>

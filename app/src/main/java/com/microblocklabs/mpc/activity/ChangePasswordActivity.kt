@@ -160,17 +160,47 @@ class ChangePasswordActivity : BaseActivity() {
                 }
             }
             return
-        }else if(!CommonUtils.isPasswordValidate(password)){
-            binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
-            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            CommonUtils.alertDialog(this, resources.getString(R.string.password_not_valid))
-            return
-        }else if(password != confirmPassword){
-            binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
-            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            CommonUtils.alertDialog(this, resources.getString(R.string.pass_confirm_pass_not_matching))
+        }else if(!CommonUtils.isOTPValid(emailOtp) or !CommonUtils.isPasswordValidate(password) or (password != confirmPassword)){
+            if(!CommonUtils.isOTPValid(emailOtp) and !CommonUtils.isPasswordValidate(password) and (password != confirmPassword)){
+                binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_red)
+                binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.otp_pass_confirm_pass_wrong))
+            }else{
+                if(!CommonUtils.isOTPValid(emailOtp) and !CommonUtils.isPasswordValidate(password)){
+                    binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.otp_pass_wrong))
+                }else if(!CommonUtils.isPasswordValidate(password) and (password != confirmPassword)){
+                    binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.pass_wrong_confirm_pass_not_match))
+                }else if (!CommonUtils.isOTPValid(emailOtp) and (password != confirmPassword)){
+                    binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.otp_wrong_confirm_pass_not_match))
+                }else{
+                    if(!CommonUtils.isOTPValid(emailOtp)) {
+                        binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        CommonUtils.alertDialog(this, resources.getString(R.string.otp_suggestion))
+                    }else if(!CommonUtils.isPasswordValidate(password)){
+                        binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.pass_correction_msg))
+                    }else if(password != confirmPassword){
+                        binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.pass_confirm_pass_not_matching))
+                    }
+                }
+            }
             return
         }else{
             binding.etEmailOtp.background = resources.getDrawable(R.drawable.bg_border_grey)

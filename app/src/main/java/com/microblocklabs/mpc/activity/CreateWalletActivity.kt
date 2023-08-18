@@ -227,32 +227,47 @@ class CreateWalletActivity : BaseActivity() {
                 }
             }
             return
-        }else if(!CommonUtils.isEmailValid(email)){
-            binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
-            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            CommonUtils.alertDialog(this, "Invalid Email id")
-            return
-        }
-//        else if(phoneWithoutCountryCode.length<10){
-//            binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
-//            binding.rlMobileBox.background = resources.getDrawable(R.drawable.bg_border_red)
-//            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-//            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-//            showWarningMessage("Invalid Mobile number")
-//            return
-//        }
-        else if(!CommonUtils.isPasswordValidate(password)){
-            binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
-            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            CommonUtils.alertDialog(this, "Password is not valid")
-            return
-        }else if(password != confirmPassword){
-            binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
-            binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
-            CommonUtils.alertDialog(this, "Password and Confirm Password are not matching")
+        }else if(!CommonUtils.isEmailValid(email) or !CommonUtils.isPasswordValidate(password) or (password != confirmPassword)){
+            if(!CommonUtils.isEmailValid(email) and  !CommonUtils.isPasswordValidate(password) and (password != confirmPassword)){
+                binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
+                binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.email_password_confirm_pass_wrong))
+            }else{
+                if(!CommonUtils.isEmailValid(email) and  !CommonUtils.isPasswordValidate(password)){
+                    binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.email_password_wrong))
+                }else if(!CommonUtils.isPasswordValidate(password) and (password != confirmPassword)){
+                    binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.pass_wrong_confirm_pass_not_match))
+                }else if(!CommonUtils.isEmailValid(email) and (password != confirmPassword)){
+                    binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
+                    binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                    binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                    CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.email_wrong_confirm_pass_not_match))
+                }else{
+                    if(!CommonUtils.isEmailValid(email)){
+                        binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        CommonUtils.alertDialog(this, resources.getString(R.string.email_not_valid))
+                    } else if(!CommonUtils.isPasswordValidate(password)){
+                        binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        CommonUtils.alertDialogWithErrorMsg(this, resources.getString(R.string.pass_correction_msg))
+                    }else if(password != confirmPassword){
+                        binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
+                        binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_red)
+                        CommonUtils.alertDialog(this, resources.getString(R.string.pass_confirm_pass_not_matching))
+                    }
+                }
+            }
             return
         }else{
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
