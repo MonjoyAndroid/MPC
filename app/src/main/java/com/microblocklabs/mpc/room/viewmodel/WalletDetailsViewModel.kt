@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 class WalletDetailsViewModel(application: Application): AndroidViewModel(application) {
 
     private val walletDetailsRepository: WalletDetailsRepository
-    private val walletdetailsList: LiveData<List<WalletDetails>>
+    val walletDetailsList: LiveData<List<WalletDetails>>
 
     init {
         val dbWalletdetails = MPCDatabase.getDatabase(application)!!.mWalletDetailsDao()
         walletDetailsRepository = WalletDetailsRepository(dbWalletdetails!!)
-        walletdetailsList = walletDetailsRepository.getWalletDetailsLive()
+        walletDetailsList = walletDetailsRepository.getWalletDetailsLive()
     }
 
     fun insertWalletDetail(walletDetails: WalletDetails){

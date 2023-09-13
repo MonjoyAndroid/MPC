@@ -26,13 +26,13 @@
             app:layout_constraintStart_toStartOf="@id/linear"
             app:layout_constraintTop_toTopOf="@id/linear">
 
-            <ImageView
-                android:id="@+id/img_alert"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginVertical="10dp"
-                android:layout_marginEnd="5dp"
-                android:src="@drawable/alert"/>
+<!--            <ImageView-->
+<!--                android:id="@+id/img_alert"-->
+<!--                android:layout_width="25dp"-->
+<!--                android:layout_height="25dp"-->
+<!--                android:layout_marginVertical="10dp"-->
+<!--                android:layout_marginEnd="5dp"-->
+<!--                android:src="@drawable/alert"/>-->
 
             <TextView
                 android:layout_width="wrap_content"

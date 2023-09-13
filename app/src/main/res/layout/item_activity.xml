@@ -111,14 +111,13 @@
         android:fontFamily="@font/gilroy_medium"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
-        android:autoLink="web"
         android:textColor="@color/light_blue_900"
+        android:maxLength="100"
         android:ellipsize="middle"
         android:maxLines="1"
         android:textSize="13sp"
         app:layout_constraintStart_toEndOf="@+id/txt_transaction_id"
         app:layout_constraintTop_toBottomOf="@+id/activity_date"
-        android:textStyle="normal"
         tools:ignore="MissingConstraints" />
 
     <ImageView

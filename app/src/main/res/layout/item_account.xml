@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_account_item"
     android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:layout_margin="20dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/black">
+    android:layout_margin="20dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/img_account"
@@ -14,6 +14,7 @@
         android:layout_height="30dp"
         android:layout_centerVertical="true"
         android:src="@drawable/cifdaq_green"
+        android:visibility="gone"
         tools:ignore="MissingConstraints" />
 
     <TextView
@@ -24,17 +25,21 @@
         android:layout_marginStart="10dp"
         android:textColor="@color/white"
         android:textSize="15sp"
-        app:layout_constraintStart_toEndOf="@+id/img_activity"
+        app:layout_constraintStart_toEndOf="@+id/img_account"
         app:layout_constraintTop_toTopOf="parent"
-        android:textStyle="normal" />
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/account_address"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:fontFamily="@font/gilroy_medium"
+        android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
         android:textColor="@color/grey"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:maxLength="150"
         android:textSize="12sp"
         app:layout_constraintStart_toEndOf="@+id/img_account"
         app:layout_constraintTop_toBottomOf="@+id/account_name"
@@ -64,6 +69,7 @@
         android:textColor="@color/white"
         android:textSize="15sp"
         android:textStyle="normal"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
@@ -76,6 +82,7 @@
         android:text="$3454 USD"
         android:textColor="@color/grey"
         android:textSize="12sp"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/account_amount"
         android:textStyle="normal" />

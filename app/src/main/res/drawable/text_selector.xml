@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Normal state -->
+    <item android:state_enabled="true" android:state_pressed="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/black" /> <!-- Background color in the normal state -->
+        </shape>
+    </item>
+
+    <!-- Pressed state -->
+    <item android:state_enabled="true" android:state_pressed="true">
+        <ripple android:color="@color/grey"> <!-- Ripple color when pressed -->
+            <item android:drawable="@color/base_primary" /> <!-- Background color when pressed -->
+        </ripple>
+    </item>
+
+    <!-- Focused state (e.g., when using D-pad navigation) -->
+    <item android:state_enabled="true" android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/white" /> <!-- Background color in the focused state -->
+        </shape>
+    </item>
+</selector>

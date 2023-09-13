@@ -13,6 +13,8 @@ import cognito.CognitoServiceGrpc
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.adapter.PhraseRecyclerViewAdapter
 import com.microblocklabs.mpc.databinding.ActivityPhaseRecoveryBinding
+import com.microblocklabs.mpc.interceptor.GrpcClientRequestInterceptor
+import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import com.microblocklabs.mpc.model.PhraseData
 import com.microblocklabs.mpc.room.entity.SharePartDetails
 import com.microblocklabs.mpc.room.entity.UserProfile
@@ -22,57 +24,89 @@ import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
 import com.microblocklabs.mpc.room.viewmodel.WalletDetailsViewModel
 import com.microblocklabs.mpc.utility.CommonUtils
 import com.microblocklabs.mpc.utility.NetworkUtils
+import deleteWallet.DeleteWallet
+import deleteWallet.DeleteWalletServiceGrpc
+import io.grpc.Channel
+import io.grpc.ClientInterceptor
+import io.grpc.ClientInterceptors
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import recoverUser.RecoverUser
+import recoverUser.RecoverUserServiceGrpc
 import java.util.Random
 import kotlin.math.ceil
 
 
-class PhraseRecoveryActivity : BaseActivity() {
+class PhraseRecoveryActivity : BaseActivity(), IAlertDialogButtonClickListener {
     private lateinit var binding: ActivityPhaseRecoveryBinding
-    private lateinit var userProfileViewModel: UserProfileViewModel
-    var openPurposeVal = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3
+    var openPurposeVal = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3, Delete Wallet = 4, Recover Wallet = 5
     private val recyclerDataArrayList = ArrayList<PhraseData>()
     private lateinit var userProfile: List<UserProfile>
+    private lateinit var userProfileViewModel: UserProfileViewModel
     private lateinit var walletDetailsViewModel: WalletDetailsViewModel
     private lateinit var sharePartViewModel: SharePartViewModel
+    private var iAlertDialogButtonClickListener: IAlertDialogButtonClickListener? = null
+    private var finalResponse: Any? = null
+    private var walletPass = ""
+    private var privateKey = ""
+    private var verifiedMnemonicPhrase = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPhaseRecoveryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         openPurposeVal = intent.getIntExtra("openPhraseFor", 0)
+        userProfile = db.mUserProfileDao()!!.getUserProfile()
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
         walletDetailsViewModel = ViewModelProvider(this)[WalletDetailsViewModel::class.java]
         sharePartViewModel = ViewModelProvider(this)[SharePartViewModel::class.java]
+        iAlertDialogButtonClickListener = this
+
         when(openPurposeVal) {
             0 -> showPhraseScreenForCreateWallet()
             2 -> showPhraseScreenForForgotPassword()
             3 -> showPhraseScreenForImportWallet()
+            4 -> showPhraseScreenForDeleteWallet()
+            5 -> showPhraseScreenForRecoverWallet()
         }
 
         binding.imgArrowBack.setOnClickListener {
             onBackPressed()
         }
 
-        binding.txtCopyToClip.setOnClickListener{
-            CommonUtils.copyToClipBoard(this, userProfile[0].mnemonic)
+        binding.imgCopySecretKey.setOnClickListener{
+            CommonUtils.copyToClipBoard(this, "Seed Phrases", userProfile[0].mnemonic)
+        }
+
+        binding.txtCopyToClipSeedPhrase.setOnClickListener{
+            CommonUtils.copyToClipBoard(this, "Seed Phrases", userProfile[0].mnemonic)
+        }
+
+        binding.imgCopyPrivateKey.setOnClickListener{
+            CommonUtils.copyToClipBoard(this, "Private key", privateKey)
+        }
+
+        binding.txtCopyToClipPrivateKey.setOnClickListener{
+            CommonUtils.copyToClipBoard(this, "Private key", privateKey)
         }
 
         binding.buttonNext.setOnClickListener{
 
-//            showChangePasswordScreen()
             when(openPurposeVal) {
                 0 -> showCongratulationScreen()
                 2 -> verifyPhrase()
                 3 -> verifyPhrase()
+                4 -> CommonUtils.functionalAlertDialogWithTwoButton(this, "openConfirmDeleteWalletScreen",
+                    getString(R.string.confirm_delete_wallet), getString(R.string.confirm_delete_alert), iAlertDialogButtonClickListener!!)
+                5 -> verifyPhrase()
             }
 
         }
     }
+
 
     private fun verifyPhrase(){
         var enteredPhraseList = ArrayList<String>()
@@ -85,7 +119,12 @@ class PhraseRecoveryActivity : BaseActivity() {
 
         val nMonicString = convertListToSpaceSeparatedString(enteredPhraseList)
         if(NetworkUtils.isNetworkConnected(this)){
-            getUserDetailsByMnemonicPhrase(nMonicString)
+            when(openPurposeVal) {
+                2 -> getUserDetailsByMnemonicPhrase(nMonicString)
+                3 -> getUserDetailsByMnemonicPhrase(nMonicString)
+                5 -> recoverUserDetailsByMnemonicPhrase(userProfile[0].email,nMonicString)
+            }
+
         }else{
             CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
         }
@@ -98,26 +137,63 @@ class PhraseRecoveryActivity : BaseActivity() {
             result.append(string)
             result.append(" ")
         }
-        return if (result.length > 0) result.substring(0, result.length - 1) else ""
+        return if (result.isNotEmpty()) result.substring(0, result.length - 1) else ""
     }
 
     private fun showPhraseScreenForForgotPassword() {
         binding.imgArrowBack.visibility = View.VISIBLE
+        binding.layoutPrivateKey.visibility = View.GONE
+        binding.txtCopyToClipSeedPhrase.visibility = View.GONE
+        binding.imgCopySecretKey.visibility = View.GONE
         prepareDataForEnterPhrase()
     }
 
     private fun showPhraseScreenForImportWallet() {
         binding.imgArrowBack.visibility = View.VISIBLE
+        binding.layoutPrivateKey.visibility = View.GONE
+        binding.txtCopyToClipSeedPhrase.visibility = View.GONE
+        binding.imgCopySecretKey.visibility = View.GONE
         prepareDataForEnterPhrase()
     }
 
     private fun showPhraseScreenForCreateWallet() {
         binding.imgArrowBack.visibility = View.GONE
+        binding.layoutPrivateKey.visibility = View.GONE
+        //binding.titleSecretRecovery.text = resources.getString(R.string.secret_recovery)
+        binding.descSecretRecovery.text = resources.getString(R.string.secret_recovery_desc)
+        binding.txtCopyToClipSeedPhrase.visibility = View.VISIBLE
+        binding.imgCopySecretKey.visibility = View.VISIBLE
         prepareDataForShowPhrase()
     }
 
+    private fun showPhraseScreenForDeleteWallet() {
+        privateKey = intent.getStringExtra("privateKey")!!
+        walletPass = intent.getStringExtra("password")!!
+        binding.imgArrowBack.visibility = View.VISIBLE
+        binding.layoutPrivateKey.visibility = View.VISIBLE
+        binding.txtCopyToClipPrivateKey.text = privateKey
+        //binding.titleSecretRecovery.text = resources.getString(R.string.secret_recovery)
+        binding.descSecretRecovery.text = resources.getString(R.string.secret_recovery_delete_wallet_desc)
+        binding.txtCopyToClipSeedPhrase.visibility = View.VISIBLE
+        binding.imgCopySecretKey.visibility = View.VISIBLE
+        binding.buttonNext.text = getText(R.string.delete)
+        prepareDataForShowPhrase()
+    }
+
+    private fun showPhraseScreenForRecoverWallet() {
+        binding.imgArrowBack.visibility = View.GONE
+        binding.titleSecretRecovery.text = resources.getString(R.string.old_secret_recovery)
+        binding.descSecretRecovery.text = resources.getString(R.string.enter_secret_recovery_desc)
+        binding.layoutPrivateKey.visibility = View.GONE
+        binding.txtCopyToClipSeedPhrase.visibility = View.GONE
+        binding.imgCopySecretKey.visibility = View.GONE
+        prepareDataForEnterPhrase()
+    }
+
     private fun showCongratulationScreen() {
-        startActivity(Intent(this, CongratulationActivity::class.java))
+        startActivity(Intent(this, CongratulationActivity::class.java).apply {
+            putExtra("openWelcomeScreenFor", openPurposeVal)
+        })
         finish()
     }
 
@@ -140,7 +216,6 @@ class PhraseRecoveryActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Cognito.ForgotPasswordResponse> {
                 override fun onSuccess(response: Cognito.ForgotPasswordResponse) {
                     dismissLoadingDialog()
-//                    Log.d("MyResponse", response.toString())
                     CommonUtils.alertDialog(this@PhraseRecoveryActivity, response.message)
                     showChangePasswordScreen()
                 }
@@ -168,11 +243,7 @@ class PhraseRecoveryActivity : BaseActivity() {
 
     private fun prepareDataForShowPhrase(){
         val isEditMode = false
-//        binding.titleSecretRecovery.text = resources.getString(R.string.secret_recovery)
-        binding.descSecretRecovery.text = resources.getString(R.string.secret_recovery_desc)
-        binding.txtCopyToClip.visibility = View.VISIBLE
         var phraseList: List<String> = ArrayList<String>()
-        userProfile = db.mUserProfileDao()!!.getUserProfile()
         if(userProfile.isNotEmpty()){
             phraseList = userProfile[0].mnemonic.split(" ").map { it.trim() }
         }
@@ -207,7 +278,7 @@ class PhraseRecoveryActivity : BaseActivity() {
         val isEditMode = true
 //        binding.titleSecretRecovery.text = resources.getString(R.string.enter_phrase_title)
         binding.descSecretRecovery.text = resources.getString(R.string.enter_secret_recovery_desc)
-        binding.txtCopyToClip.visibility = View.GONE
+        binding.txtCopyToClipSeedPhrase.visibility = View.GONE
 
         val max = 12
         val weight = 4
@@ -301,6 +372,53 @@ class PhraseRecoveryActivity : BaseActivity() {
     }
 
 
+    private fun recoverUserDetailsByMnemonicPhrase(email: String, mnemonicPhrase: String) {
+        if (mnemonicPhrase.trim().isEmpty()) {
+            CommonUtils.alertDialog(this, resources.getString(R.string.please_enter_phrase))
+            return
+        }
+
+        val recoverUserService = RecoverUserServiceGrpc.newBlockingStub(connectionChannel)
+        val requestMessage = RecoverUser.RecoverUserByMnemonicRequest.newBuilder()
+            .setEmail(email)
+            .setMnemonic(mnemonicPhrase)
+            .build()
+
+        showLoadingDialog()
+
+        Single.fromCallable { recoverUserService.recoverUserByMnemonic(requestMessage) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<RecoverUser.RecoverUserByMnemonicResponse> {
+                override fun onSuccess(response: RecoverUser.RecoverUserByMnemonicResponse) {
+                    dismissLoadingDialog()
+                    if(!response.success){
+                        CommonUtils.alertDialog(this@PhraseRecoveryActivity, response.message)
+                    }else{
+                        finalResponse = response
+                        verifiedMnemonicPhrase = mnemonicPhrase
+                        CommonUtils.functionalAlertDialog(this@PhraseRecoveryActivity, openPurposeVal.toString(),
+                            resources.getString(R.string.phrase_validate_successfully), iAlertDialogButtonClickListener!!)
+                    }
+
+
+                }
+
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onError(e: Throwable) {
+                    val displayMsg =if(e.message.toString().contains(":")){
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    }else{
+                        e.message.toString()
+                    }
+                    dismissLoadingDialog()
+                    CommonUtils.alertDialog(this@PhraseRecoveryActivity, displayMsg)
+                }
+            })
+    }
+
+
     private fun getUserDetailsByMnemonicPhrase(mnemonicPhrase: String) {
         if (mnemonicPhrase.trim().isEmpty()) {
             CommonUtils.alertDialog(this, resources.getString(R.string.please_enter_phrase))
@@ -320,12 +438,9 @@ class PhraseRecoveryActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Cognito.FindUserByMnemonicPhraseResponse> {
                 override fun onSuccess(response: Cognito.FindUserByMnemonicPhraseResponse) {
                     dismissLoadingDialog()
-                    Log.d("MyResponse", response.toString())
-                    when(openPurposeVal) {
-                        2 -> checkEmailValidityByPhrase(response)
-                        3 -> saveUserData(response)
-                    }
-
+                    finalResponse = response
+                    CommonUtils.functionalAlertDialog(this@PhraseRecoveryActivity, openPurposeVal.toString(),
+                    resources.getString(R.string.phrase_validate_successfully), iAlertDialogButtonClickListener!!)
 
                 }
 
@@ -370,10 +485,10 @@ class PhraseRecoveryActivity : BaseActivity() {
                 walletList[i].accountCount,
                 walletList[i].accountName,
                 walletList[i].publickey,
-                walletList[i].twoPercent.toDouble(),
-                walletList[i].restValue.toDouble(),
-                walletList[i].perMonth.toDouble(),
-                walletList[i].cifd.toDouble(),
+                walletList[i].twoPercent,
+                walletList[i].restValue,
+                walletList[i].perMonth,
+                walletList[i].cifd,
                 walletList[i].uniqueId,
                 walletList[i].ifUniqueId
             )
@@ -385,6 +500,104 @@ class PhraseRecoveryActivity : BaseActivity() {
         }
 
         showLoginScreen()
+    }
+
+    private fun requestForDeleteWallet(email: String, password: String) {
+//        if (email.isEmpty() or password.isEmpty()) {
+//            CommonUtils.alertDialog(this, resources.getString(R.string.enter_password))
+//            return
+//        }
+
+        val interceptor: ClientInterceptor = GrpcClientRequestInterceptor(mpcSharedPref)
+        val channelWithHeader: Channel = ClientInterceptors.intercept(connectionChannel, interceptor)
+        val deleteWalletService = DeleteWalletServiceGrpc.newBlockingStub(channelWithHeader)
+
+        val requestMessage = DeleteWallet.DeleteWalletRequest.newBuilder()
+            .setEmail(email)
+            .setPassword(password)
+            .build()
+
+        showLoadingDialog()
+
+        Single.fromCallable { deleteWalletService.deleteWallet(requestMessage) }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : SingleObserver<DeleteWallet.DeleteWalletResponse> {
+                override fun onSuccess(response: DeleteWallet.DeleteWalletResponse) {
+                    dismissLoadingDialog()
+                    if (response.success) {
+                        deleteAllDataFromLocal()
+                    } else {
+                        showErrorMessage(response.error)
+                    }
+                }
+
+                override fun onSubscribe(d: Disposable) {}
+
+                override fun onError(e: Throwable) {
+                    val displayMsg = if (e.message.toString().contains(":")) {
+                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
+                    } else {
+                        e.message.toString()
+                    }
+                    dismissLoadingDialog()
+                    showErrorMessage(displayMsg)
+                }
+            })
+    }
+
+    private fun deleteAllDataFromLocal() {
+        userProfileViewModel.deleteUserProfile()
+        walletDetailsViewModel.deleteWalletDetail()
+        sharePartViewModel.deleteSharedPart()
+        navigateToSplashScreen()
+    }
+
+    private fun navigateToSplashScreen(){
+        startActivity(Intent(applicationContext, SplashScreenActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        })
+        finish()
+    }
+
+
+    override fun onPositiveButtonClick(callingPurpose: String?) {
+        when (callingPurpose) {
+            "2" -> checkEmailValidityByPhrase(finalResponse as Cognito.FindUserByMnemonicPhraseResponse)
+            "3" -> saveUserData(finalResponse as Cognito.FindUserByMnemonicPhraseResponse)
+            "openConfirmDeleteWalletScreen" -> requestForDeleteWallet(userProfile[0].email,walletPass) //replacing the value 4
+            "5" -> saveUserDataForRecoverWallet(finalResponse as RecoverUser.RecoverUserByMnemonicResponse)
+        }
+        finalResponse = null
+    }
+
+    private fun saveUserDataForRecoverWallet(response: RecoverUser.RecoverUserByMnemonicResponse) {
+        val userProfile = UserProfile(response.email, response.emailVerified, response.phoneNumber, response.phoneNumberVerified, verifiedMnemonicPhrase)
+        userProfileViewModel.updateUserProfile(userProfile)
+
+        val walletList = response.walletList
+        for (i in 0 until walletList.size){
+            val walletDetails = WalletDetails(
+                walletList[i].ethereumAddress,
+                response.email,
+                walletList[i].accountCount,
+                walletList[i].accountName,
+                walletList[i].publickey,
+                walletList[i].twoPercent,
+                walletList[i].restValue,
+                walletList[i].perMonth,
+                walletList[i].cifd,
+                walletList[i].uniqueId,
+                walletList[i].ifUniqueId
+            )
+
+            val sharedPart = walletList[i].sharepart
+            val sharePartDetails = SharePartDetails(walletList[i].ethereumAddress, sharedPart.x, sharedPart.y)
+            walletDetailsViewModel.insertWalletDetail(walletDetails)
+            sharePartViewModel.insertSharedPart(sharePartDetails)
+        }
+
+        showCongratulationScreen()
     }
 
 }

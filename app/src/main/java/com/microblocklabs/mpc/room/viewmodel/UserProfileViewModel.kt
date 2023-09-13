@@ -28,6 +28,12 @@ class UserProfileViewModel(application: Application): AndroidViewModel(applicati
         }
     }
 
+    fun updateUserProfile(userProfile: UserProfile){
+        viewModelScope.launch {
+            userProfileRepository.update(userProfile)
+        }
+    }
+
     fun deleteUserProfile(){
         viewModelScope.launch {
             userProfileRepository.deleteData()
@@ -46,9 +52,9 @@ class UserProfileViewModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    fun updateNewPassword(userId: String, encrytedPassword: String){
+    fun updateNewPassword(userId: String, encryptedPassword: String){
         viewModelScope.launch {
-//            userProfileRepository.updateNewUserPassword(userId, encrytedPassword)
+//            userProfileRepository.updateNewUserPassword(userId, encryptedPassword)
         }
     }
 

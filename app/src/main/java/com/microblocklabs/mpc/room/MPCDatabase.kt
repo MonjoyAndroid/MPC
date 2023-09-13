@@ -7,23 +7,21 @@ import androidx.room.RoomDatabase
 import com.microblocklabs.mpc.room.dao.SharedPartDao
 import com.microblocklabs.mpc.utility.Constant
 import com.microblocklabs.mpc.room.dao.UserProfileDao
+import com.microblocklabs.mpc.room.dao.VestingDetailsDao
 import com.microblocklabs.mpc.room.dao.WalletDetailsDao
 import com.microblocklabs.mpc.room.entity.SharePartDetails
 import com.microblocklabs.mpc.room.entity.UserProfile
+import com.microblocklabs.mpc.room.entity.VestingDetails
 import com.microblocklabs.mpc.room.entity.WalletDetails
 
-@Database(entities = [UserProfile::class, WalletDetails::class, SharePartDetails::class], version = Constant.DATABASE_VERSION, exportSchema = false)
+@Database(entities = [UserProfile::class, WalletDetails::class, SharePartDetails::class, VestingDetails::class], version = Constant.DATABASE_VERSION, exportSchema = false)
 abstract class MPCDatabase : RoomDatabase() {
-//    abstract fun mClientProfileDao(): ClientProfileDao?
+
     abstract fun mWalletDetailsDao(): WalletDetailsDao?
-//    abstract fun mTabUserListDao(): TabUserListDao?
     abstract fun mUserProfileDao(): UserProfileDao?
     abstract fun mSharedPartDao(): SharedPartDao?
-//    abstract fun mTemplateInfoDao(): TemplateInfoDao?
-//    abstract fun mTabAppTemplateDetailsDao(): TabAppTemplateDetailsDao?
-//    abstract fun mGroupInfoDao(): GroupInfoDao?
-//    abstract fun mCodeLibraryDao(): CodeLibraryDao?
-//    abstract fun mBulletinListDao(): BulletinListDao?
+    abstract fun mVestingDetailsDao(): VestingDetailsDao?
+
 
 
     companion object {

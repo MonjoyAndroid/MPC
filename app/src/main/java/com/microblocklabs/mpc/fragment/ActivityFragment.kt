@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import aot.armsproject.utils.AppSharedPreferenceManager
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.activity.HomeScreenActivity
+import com.microblocklabs.mpc.activity.LoginActivity
 import com.microblocklabs.mpc.adapter.ActivityAdapter
 import com.microblocklabs.mpc.databinding.FragmentActivityBinding
 import com.microblocklabs.mpc.interceptor.GrpcClientRequestInterceptor
+import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import com.microblocklabs.mpc.interfaces.OnActivityDataReceivedListener
 import com.microblocklabs.mpc.model.ActivityModel
 import com.microblocklabs.mpc.utility.CommonUtils
@@ -33,7 +35,8 @@ import listTransaction.ListTransaction
 import listTransaction.TransactionServiceGrpc
 import org.web3j.utils.Convert
 
-class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
+class ActivityFragment : Fragment(), OnActivityDataReceivedListener,
+    IAlertDialogButtonClickListener {
 
     private lateinit var binding: FragmentActivityBinding
     private lateinit var activityList: ArrayList<ActivityModel>
@@ -41,6 +44,7 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
     private lateinit var mpcSharedPref: AppSharedPreferenceManager
     private lateinit var connectionChannel: Channel
     private var senderAccountAddress: String = ""
+    private var iAlertDialogButtonClickListener: IAlertDialogButtonClickListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +63,7 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
         super.onViewCreated(view, savedInstanceState)
         myActivity = activity as HomeScreenActivity
         myActivity.setActivityDataListener(this)
+        iAlertDialogButtonClickListener = this
         setupData()
     }
 
@@ -89,7 +94,13 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
                 transactionList[i].value
             }
 
-            val tokenValue = Convert.fromWei(tokenVal, Convert.Unit.ETHER).toPlainString()
+            val tokenValue = if(!CommonUtils.isWholeNumber(tokenVal.toDouble())){
+                CommonUtils.roundToDecimalPlaces(tokenVal, 6)
+            }else{
+                CommonUtils.convertBigIntegerValueToFractionalFormat(tokenVal)
+//                 Convert.fromWei(tokenVal, Convert.Unit.ETHER).toPlainString()
+            }
+
 //            Log.d("TokenValue", tokenValue)
 
             activityList.add(ActivityModel(activityName, transactionList[i].createdAt, transactionList[i].to,
@@ -107,7 +118,7 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
         val adapter = ActivityAdapter(myActivity,this, activityList)
 
         val layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        layoutManager.stackFromEnd = true
+        layoutManager.stackFromEnd = false
         binding.recyclerToken.layoutManager = layoutManager
         // Setting the Adapter with the recyclerview
         binding.recyclerToken.adapter = adapter
@@ -145,7 +156,15 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
                         e.message.toString()
                     }
                     myActivity.dismissLoadingDialog()
-                    CommonUtils.alertDialog(requireContext(), displayMsg)
+                    if(displayMsg.contains("Unauthorized")){
+                        CommonUtils.functionalAlertDialog(requireContext(), "unAuthorizedToken", displayMsg, iAlertDialogButtonClickListener!!)
+                    }else if(displayMsg.contains("User not found")){
+                        val userDeletedMsg = getString(R.string.deleting_local_data_msg)
+                        CommonUtils.functionalAlertDialog(requireContext(), "alreadyDeletedWallet", userDeletedMsg, iAlertDialogButtonClickListener!!)
+                    }else{
+                        CommonUtils.alertDialog(requireContext(), displayMsg)
+                    }
+
                 }
             })
     }
@@ -162,14 +181,13 @@ class ActivityFragment : Fragment(), OnActivityDataReceivedListener {
 
     }
 
+    override fun onPositiveButtonClick(callingPurpose: String?) {
+        when (callingPurpose) {
+            "unAuthorizedToken" -> myActivity.callLogout(0)
 
-    @SuppressLint("QueryPermissionsNeeded")
-    fun openCifdaqScanWeb(){
-        val url = "https://cifdaqscan.io/" // Replace with the actual URL
-
-        // Create an Intent to open a web browser
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(intent)
+            "alreadyDeletedWallet" -> myActivity.callLogout(1)
+        }
     }
+
 
 }

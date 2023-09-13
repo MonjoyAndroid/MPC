@@ -60,7 +60,7 @@
         android:textColor="@color/grey"
         android:textSize="12sp"
         android:textStyle="normal"
-        android:gravity="start"
+        android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/buttonImport"
@@ -74,10 +74,11 @@
         android:layout_margin="20dp"
         app:cornerRadius="0dp"
         android:gravity="center"
+        android:foreground="@drawable/ripple_button"
         android:background="@drawable/bg_border"
         android:paddingHorizontal="20dp"
         android:text="@string/import_wallet"
-        android:textColor="@color/grey"
+        android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintTop_toTopOf="parent"
@@ -95,13 +96,78 @@
         android:layout_marginTop="10dp"
         app:cornerRadius="0dp"
         android:gravity="center"
-        android:backgroundTint="@color/base_primary"
+        android:foreground="@drawable/ripple_button"
+        android:background="@color/base_primary"
         android:paddingHorizontal="20dp"
         android:text="@string/create_wallet"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
         app:layout_constraintTop_toBottomOf="@+id/buttonImport"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText" />
+
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/buttonCreate"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:layout_marginStart="20dp"-->
+<!--        android:layout_marginEnd="20dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        app:cornerRadius="0dp"-->
+<!--        android:gravity="center"-->
+<!--        android:paddingHorizontal="20dp"-->
+<!--        android:text="@string/create_wallet"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="14sp"-->
+<!--        android:textStyle="normal"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/buttonImport"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        tools:ignore="HardcodedText" />-->
+
+    <TextView
+        android:id="@+id/tv_recover_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/incase_deleted_wallet"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRecoverUser"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/img_info_recover_wallet"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:padding="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/info_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRecoverUser"
+        tools:ignore="MissingConstraints" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonRecoverUser"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="20dp"
+        app:cornerRadius="0dp"
+        android:gravity="center"
+        android:foreground="@drawable/ripple_button"
+        android:background="@drawable/bg_border"
+        android:paddingHorizontal="20dp"
+        android:text="@string/recover_wallet"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="HardcodedText" />

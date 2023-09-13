@@ -59,7 +59,7 @@ class TokenFragment : Fragment(), OnTokenDataReceivedListener {
 
     private fun populateData() {
         tokenList = ArrayList<TokenModel>()
-        tokenList.add(TokenModel(R.drawable.cifdaq_green, "CIFD TOKEN", "0.267", "$27650.30","${CommonUtils.convertDecimalUptoSixDigits(balanceDetails!!.balance)} CIFD", "+3.45%"))
+        tokenList.add(TokenModel(R.drawable.cifdaq_green, "CIFD TOKEN", "0.267", "$27650.30","${balanceDetails!!.balance} CIFD", "+3.45%"))
 //        tokenList.add(TokenModel(R.drawable.bitcoin, "Bitcoin", "0.267", "$27650.30", "$3226.90", "+3.45%"))
 //        tokenList.add(TokenModel(R.drawable.ethereum1, "Ethereum", "0.267", "$27650.30", "$3226.90", "+3.45%"))
 //        tokenList.add(TokenModel(R.drawable.binance, "Binance Coin", "0.267", "$27650.30", "$3226.90", "+3.45%"))

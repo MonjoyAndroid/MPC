@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main_send_transaction_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -40,7 +41,7 @@
         android:layout_marginTop="30dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="30dp"
         android:fontFamily="@font/poppins_regular"
         android:text="@string/send_transaction"
         android:gravity="center"
@@ -49,25 +50,25 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/descReceived"
+        app:layout_constraintBottom_toTopOf="@+id/tv_sender_account"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:ignore="MissingConstraints" />
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/descReceived"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:fontFamily="@font/gilroy_medium"
-        android:text="@string/send_transaction_desc"
-        android:gravity="start"
-        android:textColor="@color/grey"
-        android:textSize="12sp"
-        android:textStyle="normal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/tv_sender_account"
-        tools:ignore="MissingConstraints" />
+<!--    <androidx.appcompat.widget.AppCompatTextView-->
+<!--        android:id="@+id/descReceived"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="20dp"-->
+<!--        android:fontFamily="@font/gilroy_medium"-->
+<!--        android:text="@string/send_transaction_desc"-->
+<!--        android:gravity="center"-->
+<!--        android:textColor="@color/grey"-->
+<!--        android:textSize="12sp"-->
+<!--        android:textStyle="normal"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/tv_sender_account"-->
+<!--        tools:ignore="MissingConstraints" />-->
 
     <TextView
         android:id="@+id/tv_sender_account"
@@ -101,13 +102,13 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@null"
+            android:editable="false"
             android:inputType="none"
             android:padding="15dp"
-            android:editable="false"
             android:textColor="@color/grey"
             android:textColorHint="@color/grey"
             android:textSize="13sp"
-            tools:ignore="Autofill,MissingConstraints,TextFields" />
+            tools:ignore="Autofill,Deprecated,MissingConstraints,TextFields" />
 
     </RelativeLayout>
 
@@ -151,7 +152,6 @@
         android:layout_height="wrap_content"
         android:text="@string/amount"
         android:textSize="15sp"
-        android:maxLength="16"
         android:textColor="@color/white"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
@@ -169,6 +169,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
         android:padding="15dp"
+        android:maxLength="15"
         android:textColorHint="@color/grey"
         android:textColor="@color/white"
         android:inputType="numberDecimal"
@@ -186,10 +187,9 @@
         android:text="@string/gas"
         android:textSize="15sp"
         android:textColor="@color/white"
-        android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@id/et_gas"
         app:layout_constraintTop_toBottomOf="@+id/et_sent_amount"
         tools:ignore="MissingConstraints" />
 
@@ -221,7 +221,6 @@
         android:text="@string/gas_limit"
         android:textSize="15sp"
         android:textColor="@color/white"
-        android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="@+id/et_gas_limit"

@@ -76,10 +76,10 @@ class FullScreenQRCodeFragment() : DialogFragment() {
         }
 
         imgCopyAddress.setOnClickListener {
-            CommonUtils.copyToClipBoard(requireContext(), items)
+            CommonUtils.copyToClipBoard(requireContext(), "Wallet Address",  items)
         }
         walletAddress.setOnClickListener {
-            CommonUtils.copyToClipBoard(requireContext(), items)
+            CommonUtils.copyToClipBoard(requireContext(), "Wallet Address",  items)
         }
     }
 

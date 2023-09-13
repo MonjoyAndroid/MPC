@@ -103,6 +103,7 @@
             android:background="@null"
             android:layout_toStartOf="@+id/img_show_hide_pass"
             android:hint="@string/enter_password"
+            android:maxLength="25"
             android:inputType="textPassword"
             android:padding="15dp"
             android:textColor="@color/white"

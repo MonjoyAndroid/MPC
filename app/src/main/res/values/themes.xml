@@ -19,22 +19,11 @@
         <item name="DialogSpotCount">5</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay"
-        parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay"
-        parent="ThemeOverlay.AppCompat.Light" />
-
     <style name="FullScreenDialog" parent="Base.Theme.MPC">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowIsFloating">false</item>
         <item name="android:navigationBarColor">@color/black</item>
-    </style>
-
-    <style name="ThemeOverlay.MPC.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
-        <item name="fullscreenTextColor">@color/light_blue_A200</item>
     </style>
 
     <style name="AppBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
@@ -46,9 +35,20 @@
     </style>
 
 
-    <style name="AnimationForDialog" >
+    <style name="AnimationForDialog">
         <item name="android:windowEnterAnimation">@anim/dialog_zoom_in</item>
         <item name="android:windowExitAnimation">@anim/dialog_zoom_out</item>
+    </style>
+
+    <style name="ThemeOverlay.MPC.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+    </style>
+
+    <style name="Theme.MPC.Fullscreen" parent="Theme.MPC">
+        <item name="android:actionBarStyle">@style/Widget.Theme.MPC.ActionBar.Fullscreen</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
     </style>
 
 </resources>

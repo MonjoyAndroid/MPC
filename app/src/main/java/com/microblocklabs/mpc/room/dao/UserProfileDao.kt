@@ -9,6 +9,9 @@ interface UserProfileDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(userProfile: UserProfile)
 
+    @Update
+    suspend fun update(userProfile: UserProfile)
+
     @Query("DELETE FROM UserProfileDetails")
     suspend fun deleteAll()
 

@@ -30,7 +30,7 @@ class OTPVerificationActivity : BaseActivity() {
     private lateinit var binding: ActivityOtpverificationBinding
     private lateinit var userProfileViewModel: UserProfileViewModel
     private var userProfile: List<UserProfile>? = null
-    var openPurposeVal = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3
+    var openPurposeVal = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3, Recover Wallet = 5
 
     var startMiliSeconds = 60000L * 3
     lateinit var countdownTimer: CountDownTimer
@@ -101,6 +101,7 @@ class OTPVerificationActivity : BaseActivity() {
                 0 -> navigateToPhraseScreen(openPurposeVal)
                 1 -> navigateToHomeScreen()
                 2 -> navigateToPhraseScreen(openPurposeVal)
+                5 -> navigateToPhraseScreen(openPurposeVal)
             }
         }else{
             binding.etEmailOtp.background = ContextCompat.getDrawable(applicationContext, R.drawable.bg_border_red)
@@ -214,7 +215,7 @@ class OTPVerificationActivity : BaseActivity() {
                     dismissLoadingDialog()
                     val isVerified = response.message.equals("OTP verified successfully")
 
-                    if (openPurposeVal == 0) {
+                    if (openPurposeVal == 0 || openPurposeVal == 5) {
                         userProfileViewModel.updateUserConfirmation(userProfile!![0].email, true)
                     }
                     setNavigationValueForNextScreen(isVerified)

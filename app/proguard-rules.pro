@@ -21,7 +21,7 @@
 #-renamesourcefileattribute SourceFile
 
 # Keep the entry point to your app's main class
--keep public class com.microblocklabs.mpc.activity.SplashActivity
+-keep public class com.microblocklabs.mpc.activity.SplashScreenActivity
 
 # Keep the names of classes and fields that are used for reflection
 -keepclassmembers class * {

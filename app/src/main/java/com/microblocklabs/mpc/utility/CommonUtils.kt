@@ -8,6 +8,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -23,6 +24,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import dmax.dialog.BuildConfig
+import org.web3j.utils.Convert
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
@@ -66,6 +70,29 @@ object CommonUtils {
         return address.matches(ethereumAddressRegex.toRegex())
     }
 
+    fun isPositiveBigInteger(value: BigInteger): Boolean {
+        return value > BigInteger.ZERO
+    }
+
+    fun isWholeNumber(number: Double): Boolean {
+        return number % 1 == 0.0
+    }
+
+    fun convertFractionalValueToBigIntegerFormat(fractionVal: String): BigInteger {
+        return Convert.toWei(fractionVal, Convert.Unit.ETHER).toBigInteger()
+    }
+
+    fun convertBigIntegerValueToFractionalFormat(bigIntegerVal: String): String {
+        return Convert.fromWei(bigIntegerVal, Convert.Unit.ETHER).toPlainString()
+    }
+
+    //Used to avoid multiple click within 1 second interval
+    fun isButtonActiveForClick(lastClickTime: Long): Boolean {
+        val debounceInterval = 1000L // Set the desired interval in milliseconds
+        val currentTime = System.currentTimeMillis()
+        return currentTime - lastClickTime >= debounceInterval
+    }
+
     fun goToNextScreenWithoutFinish(cls: Class<*>?, ct: Context) {
         val intent = Intent(ct, cls)
         ct.startActivity(intent)
@@ -101,11 +128,19 @@ object CommonUtils {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
-    fun copyToClipBoard(context: Context, textToCopy: String){
+    fun copyToClipBoard(context: Context, typeOfText: String, textToCopy: String){
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Copy To Clipboard",textToCopy)
         clipboard.setPrimaryClip(clip)
-        showToastMessage(context, context.resources.getString(R.string.copy_to_clip))
+        showToastMessage(context, "$typeOfText ${context.resources.getString(R.string.copy_to_clip)}")
+    }
+
+    fun roundToDecimalPlaces(balValStr: String, decimalPlaces: Int): BigDecimal {
+        val parsedValue = balValStr.toBigDecimal()
+        val pattern = "#." + "0".repeat(decimalPlaces)
+        val decimalFormat = DecimalFormat(pattern)
+        decimalFormat.roundingMode = RoundingMode.HALF_UP
+        return decimalFormat.format(parsedValue).toBigDecimal()
     }
 
     fun convertDecimalUptoFourDigits(decimalVal: Double): Double{
@@ -132,8 +167,14 @@ object CommonUtils {
         return (if (applicationInfo != null) context.packageManager.getApplicationLabel(applicationInfo).toString() else "Unknown")
     }
 
-    fun getAppVersionName(): String? {
-        return BuildConfig.VERSION_NAME
+    fun getAppVersionName(context: Context): String? {
+        var packageInfo: PackageInfo? = null
+        try {
+            packageInfo = context.packageManager.getPackageInfo(context.applicationInfo.packageName, 0)
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.d("TAG", "The package with the given name cannot be found on the system.")
+        }
+        return (if (packageInfo != null) packageInfo.versionName else "Unknown")
         }
 
     fun getCurrentDate(format: String?): String? {
@@ -151,7 +192,7 @@ object CommonUtils {
     @SuppressLint("SimpleDateFormat")
     fun convertDateFormat(inputDateString: String): String {
         val inputFormat = SimpleDateFormat("EEE MMM dd yyyy HH:mm:ss 'GMT'Z (zzzz)", Locale.ENGLISH) // Input format
-        val outputFormat = SimpleDateFormat("dd/MM/yyyy h:mm:ss a", Locale.ENGLISH) // Desired output format
+        val outputFormat = SimpleDateFormat("dd MMM yyyy h:mm:ss a", Locale.ENGLISH) // Desired output format
 
         val date: Date = inputFormat.parse(inputDateString) as Date
         return outputFormat.format(date)
@@ -200,6 +241,28 @@ object CommonUtils {
         text.text = message
         val okButton = dialog.findViewById<TextView>(R.id.button_ok)
         okButton.setOnClickListener {
+            dialog.dismiss()
+            iAlertDialogButtonClickListener.onPositiveButtonClick(callingPurpose)
+        }
+    }
+
+    fun functionalAlertDialogWithTwoButton(context: Context?, callingPurpose:String?, titleStr :String?, msg: String?, iAlertDialogButtonClickListener: IAlertDialogButtonClickListener) {
+        var message = msg
+        message = message?.replace("\r".toRegex(), "\n") ?: ""
+        val dialog = Dialog(context!!)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_alert_with_two_button)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+        val title = dialog.findViewById<TextView>(R.id.title)
+        title.text = titleStr
+        val text = dialog.findViewById<TextView>(R.id.txtDisplayName)
+        text.text = message
+        val noButton = dialog.findViewById<TextView>(R.id.button_no)
+        noButton.setOnClickListener { dialog.dismiss() }
+        val yesButton = dialog.findViewById<TextView>(R.id.button_yes)
+        yesButton.setOnClickListener {
             dialog.dismiss()
             iAlertDialogButtonClickListener.onPositiveButtonClick(callingPurpose)
         }

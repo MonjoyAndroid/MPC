@@ -8,12 +8,27 @@ service CreateAccService {
 
 message CreateAccRequest {
     string accountName = 1;
+    string mnemonic = 2;
+    string uniqueId = 3;
+
 }
 
 message CreateAccResponse {
     int32 accountCount = 1;
     string accountName = 2;
     string ethereumAddress = 3;
-    string publicKey = 4;
-    string sharepart = 5;
+    string publickey = 4;
+    Share sharepart = 5;
+    double TwoPercent = 6;
+    double RestValue = 7;
+    double PerMonth = 8;
+    double Cifd = 9;
+    string uniqueId = 10;
+    bool ifUniqueId = 11;
+    
+}
+
+message Share {
+  string x = 1;
+  string y = 2;
 }

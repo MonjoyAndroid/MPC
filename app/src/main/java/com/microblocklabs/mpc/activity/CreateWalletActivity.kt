@@ -1,23 +1,33 @@
 package com.microblocklabs.mpc.activity
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.Window
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.marginEnd
 import androidx.lifecycle.ViewModelProvider
+import com.github.barteksc.pdfviewer.PDFView
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener
+import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
+import com.google.android.material.button.MaterialButton
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityCreateWalletBinding
 import com.microblocklabs.mpc.room.entity.SharePartDetails
@@ -28,6 +38,8 @@ import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
 import com.microblocklabs.mpc.room.viewmodel.WalletDetailsViewModel
 import com.microblocklabs.mpc.utility.CommonUtils
 import com.microblocklabs.mpc.utility.NetworkUtils
+import com.microblocklabs.mpc.utility.UpperCaseTextWatcher
+import com.shockwave.pdfium.PdfDocument
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,8 +47,10 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import signup.SignUpServiceGrpc
 import signup.Signup
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
-class CreateWalletActivity : BaseActivity() {
+class CreateWalletActivity : BaseActivity(), OnPageChangeListener, OnLoadCompleteListener {
     private lateinit var binding: ActivityCreateWalletBinding
     private var showInfoPop: PopupWindow?= null
     private lateinit var userProfileViewModel: UserProfileViewModel
@@ -50,6 +64,8 @@ class CreateWalletActivity : BaseActivity() {
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
         walletDetailsViewModel = ViewModelProvider(this)[WalletDetailsViewModel::class.java]
         sharePartViewModel = ViewModelProvider(this)[SharePartViewModel::class.java]
+        val textWatcher = UpperCaseTextWatcher(binding.etUniqueId)
+        binding.etUniqueId.addTextChangedListener(textWatcher)
 
         binding.imgArrowBack.setOnClickListener {
             onBackPressed()
@@ -79,6 +95,10 @@ class CreateWalletActivity : BaseActivity() {
         binding.imgShowHideConfirmPass.setOnClickListener {
             if (binding.etConfirmPassword.length() > 0)
                 showHidePass("ShowConfirmPass")
+        }
+
+        binding.tvTermsConditions.setOnClickListener {
+            openTermsAndConditionsPopup()
         }
 
         binding.buttonVerify.setOnClickListener{
@@ -151,6 +171,22 @@ class CreateWalletActivity : BaseActivity() {
                 binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
             }
         })
+
+//        binding.etUniqueId.addTextChangedListener(object: TextWatcher {
+//            override fun afterTextChanged(s: Editable?) {
+//            }
+//
+//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+//
+//            }
+//
+//            @SuppressLint("UseCompatLoadingForDrawables")
+//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+//                val text = s.toString().uppercase(Locale.ROOT)
+//                binding.etUniqueId.setText(text)
+//                binding.etUniqueId.setSelection(text.length)
+//            }
+//        })
     }
 
     private fun showHidePass(showHideFor: String) {
@@ -273,11 +309,16 @@ class CreateWalletActivity : BaseActivity() {
             binding.etEmail.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
             binding.rlConfirmPasswordBox.background = resources.getDrawable(R.drawable.bg_border_grey)
-            if(NetworkUtils.isNetworkConnected(this)){
-                requestForRegisterUser(email, phone, password, uniqueID)
+            if(binding.checkBoxTerms.isChecked){
+                if(NetworkUtils.isNetworkConnected(this)){
+                    requestForRegisterUser(email, phone, password, uniqueID)
+                }else{
+                    CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+                }
             }else{
-                CommonUtils.alertDialog(this, resources.getString(R.string.no_internet))
+                showMessage(getString(R.string.terms_condition_agree_msg))
             }
+
 
         }
     }
@@ -395,5 +436,97 @@ class CreateWalletActivity : BaseActivity() {
             putExtra("OTPVerificationOpenFor", 0)
         })
         finishAffinity()
+    }
+
+
+
+    @SuppressLint("MissingInflatedId", "SetJavaScriptEnabled")
+    private fun openTermsAndConditionsPopup(){
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.custom_dialog_pdfview)
+        dialog.setCanceledOnTouchOutside(false)
+        dialog.show()
+
+        val btnDecline = dialog.findViewById<MaterialButton>(R.id.button_decline)
+        btnDecline.setOnClickListener {
+            binding.checkBoxTerms.isChecked = false
+            dialog.dismiss()
+        }
+        val btnAccept = dialog.findViewById<MaterialButton>(R.id.button_accept)
+        btnAccept.setOnClickListener {
+            binding.checkBoxTerms.isChecked = true
+            dialog.dismiss()
+        }
+
+
+//        val pdfView = dialog.findViewById<PDFView>(R.id.pdfView)
+//        val assetManager = this.assets
+//        val inputStream = assetManager.open("terms.pdf")
+//        pdfView.fromStream(inputStream).load()
+
+
+//        pdfView.fromAsset("covidfullvaccination.pdf")
+//            .defaultPage(0)
+//            .enableSwipe(true)
+//            .swipeHorizontal(false)
+//            .enableAnnotationRendering(true)
+//            .scrollHandle(DefaultScrollHandle(this))
+//            .onPageError { page, _ ->
+//                showErrorMessage("Error at page: $page")
+//            }
+//            .load()
+
+
+//        val pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" // Replace with your PDF URL
+//        val pdfUri = Uri.parse(pdfUrl)
+//        // Load PDF from the URL
+//        pdfView.fromUri(pdfUri)
+//            .load()
+
+
+        val webView = dialog.findViewById<WebView>(R.id.webView)
+        webView.settings.builtInZoomControls = true
+        webView.settings.displayZoomControls = false
+        webView.setInitialScale(100)
+//        webView.requestFocus()
+        webView.settings.javaScriptEnabled = true
+
+        val myPdfUrl = "https://cifdaqwallet.com/assets/pdf/cifdaqwallet_terms_conditions.pdf"
+//        val myPdfUrl = "https://cifdaqscan.io/assets/cifdaqwallet_terms_conditions.pdf"
+//        val myPdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+        val url = "https://drive.google.com/viewerng/viewer?embedded=true&url=$myPdfUrl"
+        webView.loadUrl(url)
+
+    }
+
+    private fun getAssetFromFolder(): String {
+        val assetManager = applicationContext.assets
+        val inputStream: InputStream = assetManager.open("terms.pdf")
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        val buffer = ByteArray(1024)
+        var len: Int
+        while (inputStream.read(buffer).also { len = it } != -1) {
+            byteArrayOutputStream.write(buffer, 0, len)
+        }
+        val pdfByteArray = byteArrayOutputStream.toByteArray()
+        val charset = Charsets.UTF_8 // Specify the character encoding you want to use
+        val convertedString = String(pdfByteArray, charset)
+        return convertedString
+    }
+
+
+    private fun getPdfNameFromAssets(): String {
+        return "file:///android_asset/terms.pdf"
+    }
+
+    override fun onPageChanged(page: Int, pageCount: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun loadComplete(nbPages: Int) {
+//        val meta: PdfDocument.Meta = pdfView.getDocumentMeta()
+//        printBookmarksTree(pdfView.getTableOfContents(), "-")
     }
 }

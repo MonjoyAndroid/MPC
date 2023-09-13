@@ -11,6 +11,7 @@ import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.interceptor.GrpcClientRequestInterceptor
 import com.microblocklabs.mpc.interceptor.GrpcClientResponseInterceptor
 import com.microblocklabs.mpc.room.MPCDatabase
+import com.microblocklabs.mpc.utility.Constant
 import dmax.dialog.SpotsDialog
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
@@ -26,27 +27,23 @@ open class BaseActivity : AppCompatActivity() {
 
     val connectionChannel: ManagedChannel by lazy{
 
-//        OkHttpChannelBuilder.forAddress("54.145.255.3", 50051) // Test
-//            .usePlaintext()
-//            .build()
-
-        OkHttpChannelBuilder.forAddress("34.201.39.208", 50051) // Production
+        OkHttpChannelBuilder.forAddress(Constant.baseURLForProd, Constant.portNumber)
             .usePlaintext()
             .build()
     }
 
-    val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress("34.201.39.208", 50051)
-//     val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress("54.145.255.3", 50051)
+//    val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress(Constant.baseURLForProd, Constant.portNumber)  // Production Server
+     val connectionChannelWithInterceptor  = ManagedChannelBuilder.forAddress(Constant.baseURLForDev, Constant.portNumber)  // Dev Server
         .usePlaintext()
         .build()!!
 
-    val connectionChannelWithInterceptorForLogin  = ManagedChannelBuilder.forAddress("34.201.39.208", 50051)
-//    val connectionChannelWithInterceptorForLogin  = ManagedChannelBuilder.forAddress("54.145.255.3", 50051)
+    val connectionChannelWithInterceptorForLogin  = ManagedChannelBuilder.forAddress(Constant.baseURLForProd, Constant.portNumber)
         .intercept(GrpcClientResponseInterceptor())
         .usePlaintext()
         .build()!!
 
 
+    @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

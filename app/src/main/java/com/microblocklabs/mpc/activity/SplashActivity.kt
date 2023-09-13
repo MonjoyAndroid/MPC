@@ -8,7 +8,6 @@ import android.os.Looper
 import android.view.WindowManager
 import androidx.lifecycle.ViewModelProvider
 import com.microblocklabs.mpc.databinding.ActivitySplashBinding
-import com.microblocklabs.mpc.room.MPCDatabase
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.room.entity.WalletDetails
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
@@ -29,6 +28,19 @@ class SplashActivity : BaseActivity() {
     private var userProfile: List<UserProfile>? = null
     private var walletList: List<WalletDetails>? = null
 
+    private var shouldNavigate = true
+    private val delayMillis = 3000L // 3 seconds
+
+    private val navigateRunnable = Runnable {
+        if (shouldNavigate) {
+            checkingForNextScreen()
+            // Animate the loading of new activity
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            // Close this activity
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
@@ -36,20 +48,23 @@ class SplashActivity : BaseActivity() {
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
         walletDetailsViewModel = ViewModelProvider(this)[WalletDetailsViewModel::class.java]
         fetchDataFromDatabase()
-//        addDemoData()
 
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
-        Handler(Looper.getMainLooper()).postDelayed({
-            checkingForNextScreen()
-            // Animate the loading of new activity
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-            // Close this activity
-            finish()
+        Handler(Looper.getMainLooper()).postDelayed(navigateRunnable, delayMillis)
+    }
 
-        }, 3000)
+
+    override fun onBackPressed() {
+        shouldNavigate = false
+        super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        Handler(Looper.getMainLooper()).removeCallbacks(navigateRunnable)
+        super.onDestroy()
     }
 
     private fun fetchDataFromDatabase(){
@@ -64,11 +79,19 @@ class SplashActivity : BaseActivity() {
             startActivity(intent)
         }else{
             if(userProfile!![0].emailVerified){
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                if(userProfile!![0].mnemonic.isEmpty()){
+                    callSecretPhraseScreen()
+                }else{
+                    callLoginScreen()
+                }
             }else{
                 requestForSendOTP(userProfile!![0].email)
-                callOTPVerificationScreen()
+                val otpVerificationOpenFor = if(userProfile!![0].mnemonic.isEmpty()){
+                    5 // OTP verification screen open for Recover wallet
+                }else{
+                    0 // OTP verification screen open for Create new wallet
+                }
+                callOTPVerificationScreen(otpVerificationOpenFor)
             }
         }
     }
@@ -104,30 +127,25 @@ class SplashActivity : BaseActivity() {
             })
     }
 
-    private fun callOTPVerificationScreen() {
+    private fun callOTPVerificationScreen(otpVerificationCallFor: Int) {
         val intent = Intent(this@SplashActivity, OTPVerificationActivity::class.java).apply {
-            putExtra("OTPVerificationOpenFor", 0)
+            putExtra("OTPVerificationOpenFor", otpVerificationCallFor)
         }
         startActivity(intent)
     }
 
-    private fun addDemoData() {
-//        val userProfile = UserProfile("1111", true, "abcd@gmail.com", "9089765431", "asd asdf asdfg werr n")
-//        userProfileViewModel.insertUserProfile(userProfile)
-
-//        val walletList = response.walletList
-//        for (i in 0 until walletList.size){
-//            val walletDetails = WalletDetails(
-//                walletList[i].ethereumAddress,
-//                response.userid,
-//                walletList[i].accountCount,
-//                walletList[i].accountName,
-//                walletList[i].publickey,
-//                walletList[i].sharepart
-//            )
-//
-//            walletDetailsViewModel.insertWalletDetail(walletDetails)
-//        }
-
+    private fun callSecretPhraseScreen() {
+        val intent = Intent(this@SplashActivity, PhraseRecoveryActivity::class.java).apply {
+            putExtra("openPhraseFor", 5)
+        }
+        startActivity(intent)
     }
+
+    private fun callLoginScreen() {
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+    }
+
+
+
 }

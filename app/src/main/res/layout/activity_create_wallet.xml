@@ -183,6 +183,7 @@
             android:layout_toStartOf="@+id/img_show_hide_pass"
             android:hint="@string/enter_password"
             android:inputType="textPassword"
+            android:maxLength="25"
             android:padding="15dp"
             android:maxLines="1"
             android:textColor="@color/white"
@@ -240,6 +241,7 @@
             android:layout_toStartOf="@+id/img_show_hide_confirm_pass"
             android:hint="@string/enter_confirm_password"
             android:inputType="textPassword"
+            android:maxLength="25"
             android:padding="15dp"
             android:maxLines="1"
             android:textColor="@color/white"
@@ -364,13 +366,15 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_unique_id"
         tools:ignore="MissingConstraints">
 
+
+
         <EditText
             android:id="@+id/et_unique_id"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@null"
             android:hint="@string/enter_unique_id"
-            android:digits = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            android:digits = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
             android:padding="15dp"
             android:maxLines="1"
             android:textColor="@color/white"
@@ -379,6 +383,35 @@
             tools:ignore="Autofill,MissingConstraints,TextFields" />
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_terms_conditions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rl_unique_id_box"
+        tools:ignore="MissingConstraints">
+
+        <CheckBox
+            android:id="@+id/check_box_terms"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I agree to the "
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/tv_terms_conditions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Terms and Conditions"
+            android:textColor="@color/light_blue_900"
+            android:textStyle="bold"
+            android:clickable="true" />
+    </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/buttonVerify"
@@ -397,7 +430,7 @@
         android:textColor="@color/white"
         android:textSize="14sp"
         android:textStyle="normal"
-        app:layout_constraintTop_toBottomOf="@+id/rl_unique_id_box"
+        app:layout_constraintTop_toBottomOf="@+id/layout_terms_conditions"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="HardcodedText" />

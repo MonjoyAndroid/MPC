@@ -19,6 +19,7 @@ import cognito.Cognito
 import cognito.CognitoServiceGrpc
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityChangePasswordBinding
+import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import com.microblocklabs.mpc.room.entity.UserProfile
 import com.microblocklabs.mpc.utility.CommonUtils
 import com.microblocklabs.mpc.utility.NetworkUtils
@@ -28,10 +29,11 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
-class ChangePasswordActivity : BaseActivity() {
+class ChangePasswordActivity : BaseActivity(), IAlertDialogButtonClickListener {
     private lateinit var binding: ActivityChangePasswordBinding
     private var showInfoPop: PopupWindow?= null
     private var userProfile: List<UserProfile>? = null
+    private var iAlertDialogButtonClickListener: IAlertDialogButtonClickListener? = null
 
     var startMiliSeconds = 60000L * 3
     lateinit var countdownTimer: CountDownTimer
@@ -42,6 +44,7 @@ class ChangePasswordActivity : BaseActivity() {
         binding = ActivityChangePasswordBinding.inflate(layoutInflater)
         setContentView(binding.root)
         userProfile = db.mUserProfileDao()!!.getUserProfile()
+        iAlertDialogButtonClickListener = this
         setOtpTimer()
 
         if(userProfile.isNullOrEmpty()){
@@ -364,8 +367,8 @@ class ChangePasswordActivity : BaseActivity() {
             .subscribe(object : SingleObserver<Cognito.ConfirmForgotPasswordResponse> {
                 override fun onSuccess(response: Cognito.ConfirmForgotPasswordResponse) {
                     dismissLoadingDialog()
-                    CommonUtils.alertDialog(this@ChangePasswordActivity, response.message)
-                    showLoginScreen()
+                    CommonUtils.functionalAlertDialog(this@ChangePasswordActivity, "requestForChangePassword",
+                    resources.getString(R.string.otp_verified_password_changed), iAlertDialogButtonClickListener!!)
                 }
 
                 override fun onSubscribe(d: Disposable) {}
@@ -388,4 +391,11 @@ class ChangePasswordActivity : BaseActivity() {
         })
         finishAffinity()
     }
+
+    override fun onPositiveButtonClick(callingPurpose: String?) {
+        when (callingPurpose) {
+            "requestForChangePassword" -> showLoginScreen()
+        }
+    }
+
 }

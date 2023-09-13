@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 class SharePartViewModel(application: Application): AndroidViewModel(application) {
 
     private val sharedPartRepository: SharedPartRepository
-    private val sharedPartList: LiveData<List<SharePartDetails>>
+    val sharedPartList: LiveData<List<SharePartDetails>>
 
     init {
         val dbSharedPart = MPCDatabase.getDatabase(application)!!.mSharedPartDao()

@@ -4,10 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.Serializable
 import java.lang.reflect.Type
 
 
-class AppSharedPreferenceManager constructor(context: Context) {
+class AppSharedPreferenceManager constructor(context: Context): Serializable {
     // constants.
     private val PREFERENCES = "MPC_preferences"
     private val mSharedPreference: SharedPreferences

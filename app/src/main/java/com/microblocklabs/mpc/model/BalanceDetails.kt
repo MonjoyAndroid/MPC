@@ -1,8 +1,8 @@
 package com.microblocklabs.mpc.model
 
-import java.net.Inet4Address
+import java.math.BigDecimal
 
 data class BalanceDetails(
-    var balance : Double = 0.000000,
+    var balance : BigDecimal,
     var walletAddress : String,
 )

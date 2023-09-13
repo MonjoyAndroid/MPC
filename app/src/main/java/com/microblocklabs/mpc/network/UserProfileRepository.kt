@@ -15,6 +15,11 @@ class UserProfileRepository(private val userProfileDao: UserProfileDao) {
     }
 
     @WorkerThread
+    suspend fun update(userProfile: UserProfile){
+        userProfileDao.update(userProfile)
+    }
+
+    @WorkerThread
     suspend fun deleteData() {
         userProfileDao.deleteAll()
     }

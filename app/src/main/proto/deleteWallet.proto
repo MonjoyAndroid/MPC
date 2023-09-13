@@ -2,31 +2,31 @@ syntax = "proto3";
 
 package deleteWallet;
 
-message deleteWalletRequest {
+message DeleteWalletRequest {
   string email = 1;
   string password = 2;
 }
 
-message deleteWalletResponse {
+message DeleteWalletResponse {
   bool success = 1;
   string message = 2;
   string userId = 3;
   string error = 4;
 }
 
-message deleteWalletConfirmRequest {
+message DeleteWalletConfirmRequest {
   string email = 1;
   string password = 2;
 }
 
-message deleteWalletConfirmResponse {
+message DeleteWalletConfirmResponse {
   bool success = 1;
   string privatekey = 2;
   string userId = 3;
   string error = 4;
 }
 
-service deleteWalletService {
-  rpc deleteWalletConfirm(deleteWalletConfirmRequest) returns (deleteWalletConfirmResponse);
-  rpc deleteWallet(deleteWalletRequest) returns (deleteWalletResponse);
+service DeleteWalletService {
+  rpc DeleteWalletConfirm(DeleteWalletConfirmRequest) returns (DeleteWalletConfirmResponse);
+  rpc DeleteWallet(DeleteWalletRequest) returns (DeleteWalletResponse);
 }

@@ -1,19 +1,20 @@
 package com.microblocklabs.mpc.utility
 
+import java.math.BigDecimal
+
 
 object Constant {
-    const val DATABASE_VERSION = 2
-    const val baseURL1Key = "BaseURL1"
-    const val baseURL2Key = "BaseURL2"
+    const val DATABASE_VERSION = 1
+    const val baseURLForDev = "54.145.255.3"
+    const val baseURLForProd = "34.201.39.208"
+    const val portNumber = 50051
     const val UserID = "UserID"
     const val SessionToken = "SessionToken"
+    const val privacyPolicyUrl = "https://cifdaqwallet.com/assets/pdf/privacy-policy.pdf"
+    const val termsConditionsUrl = "https://cifdaqscan.io/assets/cifdaqwallet_terms_conditions.pdf"
     const val ClientName = "ClientName"
     const val RegisterType = "RegisterType"
-    const val AOMTrial = "AOMTrial"
-    const val AOTTrial = "AOTTrial"
     const val ClientLogo = "ClientLogo"
-    const val AOMFeedbackFromEmailID = "AOMFeedbackFromEmailID"
-    const val AOMFeedbackToEmailID = "AOMFeedbackToEmailID"
     const val HeaderColour = "HeaderColour"
     const val SubHeaderColour = "SubHeaderColour"
     const val SubHeaderColourDark = "SubHeaderColourDark"
@@ -24,4 +25,6 @@ object Constant {
     const val ButtonColor = "ButtonColor"
     const val SubscriberSessionGUID = "SubscriberSessionGUID"
     const val AppName = "AppName"
+    val tokenValWithUSD: BigDecimal = BigDecimal("0.8")
+    const val INACTIVITY_TIMEOUT_MS: Long = 10 * 60 * 1000 // 10 minutes
 }

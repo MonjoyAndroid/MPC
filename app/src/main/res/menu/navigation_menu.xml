@@ -34,34 +34,34 @@
     <item
         android:id="@+id/nav_activity"
         android:icon="@drawable/icon_activity"
-        android:title="Activity"/>
+        android:title="@string/activity"/>
     <item
         android:id="@+id/nav_share"
         android:icon="@drawable/icon_share"
-        android:title="Share my public address"/>
+        android:title="@string/share_public_address"/>
     <item
         android:id="@+id/nav_view"
         android:icon="@drawable/icon_eye"
-        android:title="View on CIFDAQ scan"/>
-    <item
-        android:id="@+id/nav_settings"
-        android:icon="@drawable/icon_settings"
-        android:title="Settings"/>
+        android:title="@string/view_on_cifdaq_scan"/>
+<!--    <item-->
+<!--        android:id="@+id/nav_settings"-->
+<!--        android:icon="@drawable/icon_settings"-->
+<!--        android:title="@string/settings"/>-->
     <item
         android:id="@+id/nav_support"
         android:icon="@drawable/icon_support"
-        android:title="Support"/>
-    <item
-        android:id="@+id/nav_request"
-        android:icon="@drawable/icon_req_feature"
-        android:title="Request a feature"/>
+        android:title="@string/support"/>
+<!--    <item-->
+<!--        android:id="@+id/nav_request"-->
+<!--        android:icon="@drawable/icon_req_feature"-->
+<!--        android:title="@string/request_feature"/>-->
     <item
         android:id="@+id/nav_delete"
         android:icon="@drawable/icon_delete"
-        android:title="Delete wallet"/>
+        android:title="@string/delete_wallet"/>
     <item
         android:id="@+id/nav_logout"
         android:icon="@drawable/icon_logout"
-        android:title="Log out"/>
+        android:title="@string/logout"/>
 
 </menu>

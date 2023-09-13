@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package vestDetails;
+
+message VestDetailsRequest {
+  string email = 1;
+  string address = 2;
+}
+
+message VestDetailsResponse {
+  string totalAmount = 1;
+  string lockedAmount = 2;
+  string unlockedAmount = 3;
+  string perMonth = 4;
+  string twoPercentage = 5;
+  string claimedAmount = 6;
+  string joinedVestingCycle = 7;
+  string claimedVestingCycle = 8;
+  string isUserActive = 9;
+}
+
+service VestDetailsService {
+  rpc VestDetails(VestDetailsRequest) returns (VestDetailsResponse) {}
+}

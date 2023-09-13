@@ -3,13 +3,17 @@ package com.microblocklabs.mpc.activity
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import androidx.lifecycle.ViewModelProvider
 import com.microblocklabs.mpc.R
 import com.microblocklabs.mpc.databinding.ActivityLoginBinding
+import com.microblocklabs.mpc.interfaces.IAlertDialogButtonClickListener
 import com.microblocklabs.mpc.room.entity.UserProfile
+import com.microblocklabs.mpc.room.viewmodel.SharePartViewModel
 import com.microblocklabs.mpc.room.viewmodel.UserProfileViewModel
+import com.microblocklabs.mpc.room.viewmodel.WalletDetailsViewModel
 import com.microblocklabs.mpc.utility.CommonUtils
 import com.microblocklabs.mpc.utility.Constant
 import com.microblocklabs.mpc.utility.NetworkUtils
@@ -24,18 +28,23 @@ import login.Login.LoginRequest
 import login.LoginServiceGrpc
 
 
-class LoginActivity : BaseActivity() {
+class LoginActivity : BaseActivity(), IAlertDialogButtonClickListener {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var userProfileViewModel: UserProfileViewModel
+    private lateinit var walletDetailsViewModel: WalletDetailsViewModel
+    private lateinit var sharePartViewModel: SharePartViewModel
     private var userProfile: List<UserProfile>? = null
-    private var openFor = 0 //Create Wallet = 0, Regular Login = 1, Forgot Password = 2, Import Wallet = 3
+    private var iAlertDialogButtonClickListener: IAlertDialogButtonClickListener? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        iAlertDialogButtonClickListener = this
         userProfileViewModel = ViewModelProvider(this)[UserProfileViewModel::class.java]
+        walletDetailsViewModel = ViewModelProvider(this)[WalletDetailsViewModel::class.java]
+        sharePartViewModel = ViewModelProvider(this)[SharePartViewModel::class.java]
         fetchDataFromDatabase()
         binding.imgShowHidePass.setOnClickListener {
             if (binding.etPassword.length() > 0)
@@ -77,49 +86,6 @@ class LoginActivity : BaseActivity() {
         binding.etPassword.setSelection(binding.etPassword.length())
     }
 
-//    private fun requestForLogin(email: String, password: String) {
-//        if (email.isEmpty() or password.isEmpty()) {
-//            showWarningMessage(resources.getString(com.microblocklabs.mpc.R.string.enter_password))
-//            return
-//        }
-//
-//        val loginService = LoginServiceGrpc.newBlockingStub(connectionChannel)
-//
-//        val requestMessage = LoginRequest.newBuilder()
-//            .setEmail(email)
-//            .setPassword(password)
-//            .build()
-//
-//        showLoadingDialog()
-//
-//        Single.fromCallable { loginService.login(requestMessage) }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe(object : SingleObserver<Login.LoginResponse> {
-//                override fun onSuccess(response: Login.LoginResponse) {
-//                    dismissLoadingDialog()
-//                    if (response.success) {
-//                        saveLoginData(response)
-//                    } else {
-//                        showErrorMessage(response.error)
-//                    }
-//
-//                }
-//
-//                override fun onSubscribe(d: Disposable) {}
-//
-//                override fun onError(e: Throwable) {
-//                    val displayMsg =if(e.message.toString().contains(":")){
-//                        e.message.toString().substring(e.message.toString().lastIndexOf(":") + 1)
-//                    }else{
-//                        e.message.toString()
-//                    }
-//                    dismissLoadingDialog()
-//                    showErrorMessage(displayMsg)
-//                }
-//            })
-//    }
-
 
     private fun requestForLogin(email: String, password: String) {
         if (email.isEmpty() or password.isEmpty()) {
@@ -146,7 +112,13 @@ class LoginActivity : BaseActivity() {
                     if (response.success) {
                         saveLoginData(response)
                     } else {
-                        CommonUtils.alertDialog(this@LoginActivity, response.error)
+                        if(response.error.contains("No User Found!!")){
+                            val userDeletedMsg = getString(R.string.deleting_local_data_msg)
+                            CommonUtils.functionalAlertDialog(this@LoginActivity, "alreadyDeletedWallet", userDeletedMsg, iAlertDialogButtonClickListener!!)
+                        }else{
+                            CommonUtils.alertDialog(this@LoginActivity, response.error)
+                        }
+
                     }
 
                 }
@@ -160,10 +132,23 @@ class LoginActivity : BaseActivity() {
                         e.message.toString()
                     }
                     dismissLoadingDialog()
-                    CommonUtils.alertDialog(this@LoginActivity, displayMsg)
+                    if(displayMsg.contains("Too Many Requests")){
+                        callLockScreen()
+                    }else if(displayMsg.contains("No User Found!!")){
+                        val userDeletedMsg = getString(R.string.deleting_local_data_msg)
+                        CommonUtils.functionalAlertDialog(this@LoginActivity, "alreadyDeletedWallet", userDeletedMsg, iAlertDialogButtonClickListener!!)
+                    }else{
+                        CommonUtils.alertDialog(this@LoginActivity, displayMsg)
+                    }
+
                 }
             })
     }
+
+    private fun callLockScreen(){
+        startActivity(Intent(this, TransparentLockScreenActivity::class.java))
+    }
+
 
     private fun saveLoginData(response: Login.LoginResponse){
         mpcSharedPref.save(Constant.UserID, response.userId)
@@ -180,40 +165,29 @@ class LoginActivity : BaseActivity() {
         startActivity(Intent(applicationContext, PhraseRecoveryActivity::class.java).apply {
             putExtra("openPhraseFor", 2)
         })
-//        finish()
     }
-//
-//    private fun startSignUpActivity() {
-//        startActivity(Intent(this, SignUpActivity::class.java))
-//    }
-//
-//    private fun getDataFromServer() {
-//        val channel = OkHttpChannelBuilder.forAddress("192.168.0.102", 8080)
-//            .usePlaintext()
-//            .build()
-//        val stub = HelloServiceGrpc.newBlockingStub(channel)
-//
-//        val requestMessage = HelloRequest.newBuilder()
-//            .setName("Monjoy")
-//            .setAge(34)
-////            .setSentiment(Sentiment.HAPPY)
-//            .build()
-//
-//        Single.fromCallable { stub.greet(requestMessage) }
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe(object : SingleObserver<HelloResponse> {
-//                override fun onSuccess(t: HelloResponse) {
-//
-//                }
-//
-//                override fun onSubscribe(d: Disposable) {
-//                    Log.d("Monjoy", "on      ====/        subscribe")
-//                }
-//
-//                override fun onError(e: Throwable) {
-//
-//                }
-//            })
-//    }
+
+
+    private fun deleteAllDataFromLocal() {
+        userProfileViewModel.deleteUserProfile()
+        walletDetailsViewModel.deleteWalletDetail()
+        sharePartViewModel.deleteSharedPart()
+        navigateToSplashScreen()
+    }
+
+    private fun navigateToSplashScreen(){
+        startActivity(Intent(applicationContext, SplashScreenActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        })
+        finish()
+    }
+
+    override fun onPositiveButtonClick(callingPurpose: String?) {
+        when (callingPurpose) {
+
+            "alreadyDeletedWallet" -> deleteAllDataFromLocal()
+        }
+    }
+
+
 }
